@@ -7,6 +7,7 @@ import { db } from '@/db/client';
 import { users } from '@/db/schema';
 import { createSession, hashPassword, verifyPassword, setSessionCookie, clearSessionCookie } from '@/lib/auth';
 import { adoptPendingPlan } from '@/lib/pending-plan';
+import { checkAuthRateLimit, clearAuthAttempts, getClientIp, recordAuthAttempt } from '@/lib/rate-limit';
 
 const credentialsSchema = z.object({
   email: z.string().email('Enter a valid email address'),
@@ -26,6 +27,13 @@ export async function signUpAction(_prevState: AuthActionState, formData: FormDa
     return { error: parsed.error.issues[0]?.message ?? 'Invalid input' };
   }
   const { email, password } = parsed.data;
+  const ip = await getClientIp();
+
+  const { limited } = await checkAuthRateLimit(email, ip);
+  if (limited) {
+    return { error: 'Too many attempts. Please try again in a few minutes.' };
+  }
+  await recordAuthAttempt(email, ip);
 
   const [existing] = await db.select({ id: users.id }).from(users).where(eq(users.email, email)).limit(1);
   if (existing) {
@@ -36,8 +44,9 @@ export async function signUpAction(_prevState: AuthActionState, formData: FormDa
   const [user] = await db.insert(users).values({ email, hashedPassword }).returning();
 
   await adoptPendingPlan(user.id);
-    const sessionId = await createSession(user.id);
+  const sessionId = await createSession(user.id);
   await setSessionCookie(sessionId);
+  await clearAuthAttempts(email, ip);
 
   redirect('/account');
 }
@@ -51,6 +60,13 @@ export async function signInAction(_prevState: AuthActionState, formData: FormDa
     return { error: parsed.error.issues[0]?.message ?? 'Invalid input' };
   }
   const { email, password } = parsed.data;
+  const ip = await getClientIp();
+
+  const { limited } = await checkAuthRateLimit(email, ip);
+  if (limited) {
+    return { error: 'Too many attempts. Please try again in a few minutes.' };
+  }
+  await recordAuthAttempt(email, ip);
 
   const [user] = await db.select().from(users).where(eq(users.email, email)).limit(1);
   if (!user || !user.hashedPassword) {
@@ -63,8 +79,9 @@ export async function signInAction(_prevState: AuthActionState, formData: FormDa
   }
 
   await adoptPendingPlan(user.id);
-    const sessionId = await createSession(user.id);
+  const sessionId = await createSession(user.id);
   await setSessionCookie(sessionId);
+  await clearAuthAttempts(email, ip);
 
   redirect('/account');
 }

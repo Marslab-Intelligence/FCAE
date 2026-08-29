@@ -31,6 +31,19 @@ export const savedPlans = pgTable('saved_plans', {
   savedAt: timestamp('saved_at').notNull().defaultNow(),
 });
 
+/**
+ * Throttles credential sign-in/sign-up attempts, keyed by `${email}:${ip}`.
+ * One row per key, similar in spirit to `otpTokens.attempts` — increment on
+ * each attempt within the window, lock out once the cap is hit.
+ */
+export const authAttempts = pgTable('auth_attempts', {
+  id: text('id').primaryKey().$defaultFn(() => randomUUID()),
+  identifier: text('identifier').notNull().unique(),
+  attempts: integer('attempts').notNull().default(0),
+  windowStartedAt: timestamp('window_started_at').notNull().defaultNow(),
+  lockedUntil: timestamp('locked_until'),
+});
+
 /** Short-lived OTP tokens for passwordless email sign-in */
 export const otpTokens = pgTable('otp_tokens', {
   id: text('id').primaryKey().$defaultFn(() => randomUUID()),
