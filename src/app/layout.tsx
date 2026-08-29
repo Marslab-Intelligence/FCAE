@@ -27,8 +27,17 @@ const fraunces = Fraunces({
   style: ['normal', 'italic'],
 });
 
-// TODO: metadataBase/openGraph.url below use a placeholder domain — swap in
-// the real SIDCORPTECH/FCAE production domain once it's decided.
+// No metadataBase / OG url on purpose — no production domain has been
+// decided yet (confirmed with the client, do not hardcode a placeholder or
+// guessed domain). Without metadataBase, Next.js resolves relative OG/
+// Twitter image URLs against the request origin at render time, which is
+// correct for any domain this ends up deployed on. Set metadataBase once a
+// real domain exists.
+//
+// public/og-image.png is a corrupt 70-byte file, not a real image — OG/
+// Twitter image fields are omitted below rather than pointing at a broken
+// file. A real 1200x630 OG image needs to be designed before this matters
+// for social sharing.
 export const metadata: Metadata = {
   title: 'SID Managed Cloud — Enterprise Cloud Expertise Without Enterprise Hiring',
   description: 'Your on-demand Cloud Architecture & Engineering team for AWS, Microsoft Azure, and Hybrid Cloud — delivered through a predictable monthly subscription.',
@@ -37,28 +46,17 @@ export const metadata: Metadata = {
   creator: 'SIDCORPTECH',
   publisher: 'SIDCORPTECH',
   robots: 'index, follow',
-  metadataBase: new URL('https://www.sidcorptech.com'),
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://www.sidcorptech.com',
     title: 'SID Managed Cloud — Enterprise Cloud Expertise Without Enterprise Hiring',
     description: 'Your on-demand Cloud Architecture & Engineering team for AWS, Microsoft Azure, and Hybrid Cloud.',
     siteName: 'SID Managed Cloud',
-    images: [
-      {
-        url: '/og-image.png',
-        width: 1200,
-        height: 630,
-        alt: 'SID Managed Cloud',
-      },
-    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'SID Managed Cloud — Enterprise Cloud Expertise Without Enterprise Hiring',
     description: 'Your on-demand Cloud Architecture & Engineering team for AWS, Microsoft Azure, and Hybrid Cloud.',
-    images: ['/og-image.png'],
   },
   icons: {
     icon: '/icon.svg',
