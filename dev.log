@@ -1,0 +1,12 @@
+▲ Next.js 16.3.0 (Turbopack)
+- Local:         http://localhost:3006
+- Network:       http://192.168.88.14:3006
+- Environments: .env
+✓ Ready in 238ms
+✓ Running next.config.js took 19ms
+- Experiments (use with caution):
+  · optimizePackageImports
+
+✓ Generated AGENTS.md and CLAUDE.md for AI agents. Set `agentRules: false` in next.config to disable.
+ HEAD / 200 in 987ms (next.js: 294ms, application-code: 694ms)
+ GET / 200 in 150ms (next.js: 62ms, application-code: 88ms)

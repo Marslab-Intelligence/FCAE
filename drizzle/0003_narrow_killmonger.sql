@@ -1,0 +1,22 @@
+CREATE TABLE "leads" (
+	"id" text PRIMARY KEY NOT NULL,
+	"company_name" text NOT NULL,
+	"website" text,
+	"first_name" text NOT NULL,
+	"last_name" text NOT NULL,
+	"designation" text,
+	"email" text NOT NULL,
+	"phone" text,
+	"industry" text,
+	"physical_address" text,
+	"country" text,
+	"state" text,
+	"city" text,
+	"postal_code" text,
+	"existing_environment" text,
+	"customer_requirement" text,
+	"customer_budget" integer,
+	"plan_id" text,
+	"selected_services" text,
+	"created_at" timestamp DEFAULT now() NOT NULL
+);

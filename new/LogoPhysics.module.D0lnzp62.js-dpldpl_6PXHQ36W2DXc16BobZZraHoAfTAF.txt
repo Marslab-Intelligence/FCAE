@@ -1,0 +1,97 @@
+var e = [{
+    src: `/logos/wordpress.svg`,
+    name: `WordPress`,
+    color: `#2b6cb0`
+}, {
+    src: `/logos/react.svg`,
+    name: `React`,
+    color: `#61dafb`
+}, {
+    src: `/logos/vue.svg`,
+    name: `Vue`,
+    color: `#42b883`
+}, {
+    src: `/logos/astro.svg`,
+    name: `Astro`,
+    color: `#ff5d01`
+}, {
+    src: `/logos/elementor.svg`,
+    name: `Elementor`,
+    color: `#92003b`
+}, {
+    src: `/logos/html5.svg`,
+    name: `HTML5`,
+    color: `#e44d26`
+}, {
+    src: `/logos/shopify.svg`,
+    name: `Shopify`,
+    color: `#96bf48`
+}, {
+    src: `/logos/webflow.svg`,
+    name: `Webflow`,
+    color: `#4353ff`
+}, {
+    src: `/logos/wix.svg`,
+    name: `Wix`,
+    color: `#0c6efc`
+}, {
+    src: `/logos/bricks.svg`,
+    name: `Bricks`,
+    color: `#e44a26`
+}, {
+    src: `/logos/claude.svg`,
+    name: `Claude`,
+    color: `#d97757`
+}, {
+    src: `/logos/oxygen.svg`,
+    name: `Oxygen`,
+    color: `#3ecf8e`
+}, {
+    src: `/logos/nextjs.svg`,
+    name: `Next.js`,
+    color: `#ffffff`
+}, {
+    src: `/logos/svelte.svg`,
+    name: `Svelte`,
+    color: `#ff3e00`
+}, {
+    src: `/logos/tailwind.svg`,
+    name: `Tailwind`,
+    color: `#38bdf8`
+}, {
+    src: `/logos/nuxt.svg`,
+    name: `Nuxt`,
+    color: `#00dc82`
+}, {
+    src: `/logos/angular.svg`,
+    name: `Angular`,
+    color: `#dd0031`
+}, {
+    src: `/logos/framer.svg`,
+    name: `Framer`,
+    color: `#0055ff`
+}, {
+    src: `/logos/squarespace.svg`,
+    name: `Squarespace`,
+    color: `#ffffff`
+}]
+  , t = e.length
+  , n = e.map(e => e.src)
+  , r = e.map(e => e.color)
+  , i = {
+    reserve: `_reserve_jozp0_18`,
+    section: `_section_jozp0_32`,
+    zones: `_zones_jozp0_57`,
+    zoneCol: `_zoneCol_jozp0_68`,
+    canvasZone: `_canvasZone_jozp0_76`,
+    headerZone: `_headerZone_jozp0_83`,
+    canvasWrap: `_canvasWrap_jozp0_98`,
+    contentOverlay: `_contentOverlay_jozp0_125`,
+    scrubLayer: `_scrubLayer_jozp0_117`,
+    header: `_header_jozp0_83`,
+    headerSpotlight: `_headerSpotlight_jozp0_153`,
+    canvasFadeTop: `_canvasFadeTop_jozp0_165`,
+    canvasFade: `_canvasFade_jozp0_165`
+};
+export {n as a, t as i, e as n, r, i as t};
+

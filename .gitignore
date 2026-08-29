@@ -1,0 +1,32 @@
+# dependencies
+/node_modules
+
+# next.js — covers .next, .next_dist, .next-dev and any stale .next-* copies
+.next*
+/out/
+
+# production
+/build
+/build-*
+
+# env files
+.env
+.env*.local
+
+# misc
+.DS_Store
+*.pem
+npm-debug.log*
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# Generated snapshot for sharing — not source
+/site-export/
+
+# Playwright
+/test-results/
+/tests/visual/__out/
+/playwright-report/
+/blob-report/

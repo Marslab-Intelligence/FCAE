@@ -1,0 +1,276 @@
+import {r as e} from "./rolldown-runtime.QTnfLwEv.js?dpl=dpl_6PXHQ36W2DXc16BobZZraHoAfTAF";
+import {t} from "./jsx-runtime.C6cmW1Aq.js?dpl=dpl_6PXHQ36W2DXc16BobZZraHoAfTAF";
+import {t as n} from "./react.Dd9C78Ox.js?dpl=dpl_6PXHQ36W2DXc16BobZZraHoAfTAF";
+import {t as r} from "./src.CBg8gSPl.js?dpl=dpl_6PXHQ36W2DXc16BobZZraHoAfTAF";
+var i = e(n(), 1)
+  , a = {
+    section: `_section_rl9o1_3`,
+    inner: `_inner_rl9o1_8`,
+    label: `_label_rl9o1_14`,
+    track: `_track_rl9o1_29`,
+    slider: `_slider_rl9o1_38`,
+    logo: `_logo_rl9o1_22`,
+    logoLabel: `_logoLabel_rl9o1_74`
+}
+  , o = t()
+  , s = [{
+    name: `WordPress`,
+    src: `/logos/wordpress.svg`
+}, {
+    name: `Webflow`,
+    src: `/logos/webflow.svg`
+}, {
+    name: `Shopify`,
+    src: `/logos/shopify.svg`
+}, {
+    name: `React`,
+    src: `/logos/react.svg`
+}, {
+    name: `Vue`,
+    src: `/logos/vue.svg`
+}, {
+    name: `Astro`,
+    src: `/logos/astro.svg`
+}, {
+    name: `Elementor`,
+    src: `/logos/elementor.svg`
+}, {
+    name: `Oxygen`,
+    src: `/logos/oxygen.svg`
+}, {
+    name: `Bricks`,
+    src: `/logos/bricks.svg`
+}, {
+    name: `Wix`,
+    src: `/logos/wix.svg`
+}, {
+    name: `HTML5`,
+    src: `/logos/html5.svg`
+}, {
+    name: `Claude`,
+    src: `/logos/claude.svg`
+}, {
+    name: `Next.js`,
+    src: `/logos/nextjs.svg`
+}, {
+    name: `Svelte`,
+    src: `/logos/svelte.svg`
+}, {
+    name: `Tailwind`,
+    src: `/logos/tailwind.svg`
+}, {
+    name: `Nuxt`,
+    src: `/logos/nuxt.svg`
+}, {
+    name: `Angular`,
+    src: `/logos/angular.svg`
+}, {
+    name: `Framer`,
+    src: `/logos/framer.svg`
+}, {
+    name: `Squarespace`,
+    src: `/logos/squarespace.svg`
+}]
+  , c = .4
+  , l = .3;
+function u() {
+    let e = (0,
+    i.useRef)(null)
+      , t = (0,
+    i.useRef)(null)
+      , n = (0,
+    i.useRef)(null)
+      , u = (0,
+    i.useRef)(null)
+      , d = (0,
+    i.useRef)(null)
+      , f = (0,
+    i.useRef)(1)
+      , p = (0,
+    i.useRef)(new Map)
+      , m = (0,
+    i.useRef)(null)
+      , h = (0,
+    i.useRef)(!1);
+    (0,
+    i.useEffect)( () => {
+        let i = e.current
+          , a = t.current
+          , o = n.current;
+        if (!i || !a || !o)
+            return;
+        u.current = r(`logo-marquee`, a, {
+            to: {
+                x: `-50%`
+            },
+            duration: 40,
+            ease: `none`,
+            repeat: -1
+        });
+        let f = a.querySelectorAll(`[data-logo]`)
+          , g = new Map;
+        f.forEach( (e, t) => {
+            let n = e.querySelector(`[data-logo-label]`);
+            n && g.set(t, r(`logo-label-${t}`, n, {
+                split: `chars`,
+                from: {
+                    opacity: 0,
+                    x: 8
+                },
+                stagger: .025,
+                duration: .3,
+                ease: `power2.out`
+            }))
+        }
+        ),
+        p.current = g;
+        let _ = Array.from(a.querySelectorAll(`[data-logo] img`))
+          , v = 0;
+        function y() {
+            if (m.current = requestAnimationFrame(y),
+            v++,
+            v % 3 != 0)
+                return;
+            let e = o.getBoundingClientRect()
+              , t = e.left + e.width / 2
+              , n = e.width / 2;
+            for (let e of _) {
+                let r = e.getBoundingClientRect()
+                  , i = r.left + r.width / 2
+                  , a = Math.abs(i - t) / n
+                  , o = Math.min(Math.max((a - l) / (1 - l), 0), 1)
+                  , s = 1 - o * o * (3 - 2 * o) * (1 - c);
+                e.style.scale = `${s}`
+            }
+        }
+        function b() {
+            m.current === null && (m.current = requestAnimationFrame(y))
+        }
+        function x() {
+            m.current !== null && (cancelAnimationFrame(m.current),
+            m.current = null)
+        }
+        let S = new IntersectionObserver( ([e]) => {
+            h.current = e.isIntersecting,
+            e.isIntersecting ? (u.current?.play(),
+            b()) : (u.current?.pause(),
+            x())
+        }
+        ,{
+            threshold: 0
+        });
+        return S.observe(i),
+        () => {
+            S.disconnect(),
+            d.current !== null && (cancelAnimationFrame(d.current),
+            d.current = null),
+            x(),
+            r.kill(`logo-marquee`);
+            for (let e = 0; e < s.length * 2; e++)
+                r.kill(`logo-label-${e}`)
+        }
+    }
+    , []);
+    function g(e) {
+        if (!h.current)
+            return;
+        d.current !== null && (cancelAnimationFrame(d.current),
+        d.current = null),
+        f.current = e;
+        function t() {
+            let e = u.current;
+            if (!e || !h.current) {
+                d.current = null;
+                return
+            }
+            let n = e.timeScale()
+              , r = f.current
+              , i = r - n;
+            if (Math.abs(i) < .005) {
+                e.timeScale(r),
+                d.current = null;
+                return
+            }
+            e.timeScale(n + i * .1),
+            d.current = requestAnimationFrame(t)
+        }
+        d.current = requestAnimationFrame(t)
+    }
+    function _() {
+        g(.5)
+    }
+    function v() {
+        g(1)
+    }
+    return (0,
+    o.jsx)(`section`, {
+        ref: e,
+        className: `section ${a.section}`,
+        children: (0,
+        o.jsxs)(`div`, {
+            className: a.inner,
+            children: [(0,
+            o.jsx)(`p`, {
+                className: a.label,
+                children: `Works with every platform you already use`
+            }), (0,
+            o.jsx)(`div`, {
+                ref: n,
+                className: a.track,
+                onMouseEnter: _,
+                onMouseLeave: v,
+                children: (0,
+                o.jsx)(`div`, {
+                    ref: t,
+                    className: a.slider,
+                    children: [...s, ...s].map( (e, t) => (0,
+                    o.jsxs)(`span`, {
+                        className: a.logo,
+                        "data-logo": ``,
+                        onMouseEnter: () => p.current.get(t)?.play(),
+                        onMouseLeave: () => p.current.get(t)?.reverse(),
+                        children: [(0,
+                        o.jsx)(`img`, {
+                            src: e.src,
+                            alt: e.name,
+                            loading: `lazy`
+                        }), (0,
+                        o.jsx)(`span`, {
+                            "data-logo-label": ``,
+                            className: a.logoLabel,
+                            "aria-hidden": `true`,
+                            children: e.name
+                        })]
+                    }, t))
+                })
+            })]
+        })
+    })
+}
+var d = {
+    hero: `_hero_1rs6q_3`,
+    content: `_content_1rs6q_15`,
+    announcementWrap: `_announcementWrap_1rs6q_32`,
+    announcementGlass: `_announcementGlass_1rs6q_42`,
+    announcement: `_announcement_1rs6q_32`,
+    announcementArrow: `_announcementArrow_1rs6q_107`,
+    title: `_title_1rs6q_122`,
+    titleLine: `_titleLine_1rs6q_130`,
+    subtitle: `_subtitle_1rs6q_134`,
+    actions: `_actions_1rs6q_143`,
+    ctaBtn: `_ctaBtn_1rs6q_154`,
+    ctaArrow: `_ctaArrow_1rs6q_158`,
+    videoShowcaseAnchor: `_videoShowcaseAnchor_1rs6q_173`,
+    videoShowcase: `_videoShowcase_1rs6q_173`,
+    videoFrame: `_videoFrame_1rs6q_213`,
+    videoBar: `_videoBar_1rs6q_227`,
+    videoDots: `_videoDots_1rs6q_236`,
+    videoTitle: `_videoTitle_1rs6q_260`,
+    videoWrap: `_videoWrap_1rs6q_267`,
+    youtubePlayer: `_youtubePlayer_1rs6q_276`,
+    youtubePlaceholder: `_youtubePlaceholder_1rs6q_277`,
+    logoStripWrap: `_logoStripWrap_1rs6q_298`,
+    lightweight: `_lightweight_1rs6q_350`
+};
+export {u as n, d as t};
+

@@ -1,0 +1,153 @@
+import {r as e} from "./rolldown-runtime.QTnfLwEv.js?dpl=dpl_6PXHQ36W2DXc16BobZZraHoAfTAF";
+import {t} from "./jsx-runtime.C6cmW1Aq.js?dpl=dpl_6PXHQ36W2DXc16BobZZraHoAfTAF";
+import {t as n} from "./react.Dd9C78Ox.js?dpl=dpl_6PXHQ36W2DXc16BobZZraHoAfTAF";
+import {t as r} from "./src.CBg8gSPl.js?dpl=dpl_6PXHQ36W2DXc16BobZZraHoAfTAF";
+import {t as i} from "./preload-helper.L5lOfJxi.js?dpl=dpl_6PXHQ36W2DXc16BobZZraHoAfTAF";
+import {t as a} from "./useLightweightMode.BQClqDP-.js?dpl=dpl_6PXHQ36W2DXc16BobZZraHoAfTAF";
+import {t as o} from "./useScrollReveal.D51eiIHa.js?dpl=dpl_6PXHQ36W2DXc16BobZZraHoAfTAF";
+import {n as s, t as c} from "./LogoPhysics.module.D0lnzp62.js?dpl=dpl_6PXHQ36W2DXc16BobZZraHoAfTAF";
+var l = e(n(), 1)
+  , u = {
+    section: `_section_1nho7_7`,
+    header: `_header_1nho7_22`,
+    cloud: `_cloud_1nho7_32`,
+    cloudItem: `_cloudItem_1nho7_42`,
+    cloudInner: `_cloudInner_1nho7_55`,
+    cloudLogo: `_cloudLogo_1nho7_62`,
+    cloudLabel: `_cloudLabel_1nho7_77`
+}
+  , d = t();
+function f(e) {
+    let t = Math.sin(e * 127.1) * 43758.5453;
+    return t - Math.floor(t)
+}
+function p() {
+    let e = (0,
+    l.useRef)(null)
+      , t = (0,
+    l.useRef)(null);
+    return o(e, {
+        start: `top 85%`,
+        end: `top 55%`,
+        stagger: .03,
+        y: 22
+    }),
+    (0,
+    l.useEffect)( () => {
+        let e = t.current;
+        if (e)
+            return r(`logo-cloud-parallax`, e, {
+                to: {
+                    opacity: 1
+                },
+                duration: 1,
+                onUpdate: t => e.style.setProperty(`--sp`, String(t))
+            }).onScroll({
+                target: e,
+                start: `top bottom`,
+                end: `bottom top`,
+                scrub: !0
+            }),
+            () => {
+                r.kill(`logo-cloud-parallax`)
+            }
+    }
+    , []),
+    (0,
+    d.jsx)(`section`, {
+        ref: e,
+        className: `section ${u.section}`,
+        children: (0,
+        d.jsxs)(`div`, {
+            className: `container`,
+            children: [(0,
+            d.jsxs)(`div`, {
+                className: `section-header centered ${u.header}`,
+                "data-reveal": !0,
+                children: [(0,
+                d.jsx)(`span`, {
+                    className: `eyebrow mb-xs`,
+                    children: `Your stack, covered`
+                }), (0,
+                d.jsxs)(`h2`, {
+                    className: `section-title`,
+                    children: [`Plays nice with`, (0,
+                    d.jsx)(`br`, {}), (0,
+                    d.jsx)(`span`, {
+                        className: `light-italic`,
+                        children: `everything`
+                    })]
+                }), (0,
+                d.jsx)(`p`, {
+                    className: `subtitle`,
+                    children: `WordPress, React, Astro, Webflow, Shopify, plain HTML — Motion.page drops into whatever you've already built. Your stack stays exactly as it is.`
+                })]
+            }), (0,
+            d.jsx)(`div`, {
+                ref: t,
+                className: u.cloud,
+                children: s.map( (e, t) => {
+                    let n = .78 + f(t + 1) * .62
+                      , r = (f(t + 11) - .5) * 38
+                      , i = (f(t + 41) - .5) * 64
+                      , a = 44 + f(t + 71) * 72
+                      , o = {
+                        "--logo-scale": n.toFixed(3),
+                        "--dx": `${r.toFixed(1)}px`,
+                        "--dy": `${i.toFixed(1)}px`,
+                        "--depth": `${a.toFixed(1)}px`
+                    };
+                    return (0,
+                    d.jsx)(`span`, {
+                        className: u.cloudItem,
+                        style: o,
+                        children: (0,
+                        d.jsxs)(`span`, {
+                            className: u.cloudInner,
+                            "data-reveal": !0,
+                            children: [(0,
+                            d.jsx)(`img`, {
+                                className: u.cloudLogo,
+                                src: e.src,
+                                alt: e.name,
+                                loading: `lazy`,
+                                decoding: `async`
+                            }), (0,
+                            d.jsx)(`span`, {
+                                className: u.cloudLabel,
+                                children: e.name
+                            })]
+                        })
+                    }, e.src)
+                }
+                )
+            })]
+        })
+    })
+}
+var m = (0,
+l.lazy)( () => i( () => import(`./LogoPhysicsScene.BPG9k8_K.js?dpl=dpl_6PXHQ36W2DXc16BobZZraHoAfTAF`), []));
+function h() {
+    let e = a()
+      , [t,n] = (0,
+    l.useState)(!1);
+    return (0,
+    l.useEffect)( () => {
+        n(!0)
+    }
+    , []),
+    !t || e ? (0,
+    d.jsx)(p, {}) : (0,
+    d.jsx)(`div`, {
+        className: c.reserve,
+        children: (0,
+        d.jsx)(l.Suspense, {
+            fallback: (0,
+            d.jsx)(p, {}),
+            children: (0,
+            d.jsx)(m, {})
+        })
+    })
+}
+export {h as default};
+

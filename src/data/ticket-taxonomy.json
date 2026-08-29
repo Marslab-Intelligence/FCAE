@@ -1,0 +1,1390 @@
+{
+  "Cloud Infra": {
+    "hasTaskLevel": true,
+    "tree": {
+      "Service Request": {
+        "AWS - Compute": {
+          "EC2 Management - SR": [
+            "AWS - Create EC2 Instance",
+            "AWS - Create AMI",
+            "AWS - Restore EC2 from AMI"
+          ],
+          "Auto Scaling - SR": [
+            "AWS - Configure Auto Scaling"
+          ],
+          "Scheduling - SR": [
+            "AWS - Configure Automatic Start/Stop Schedule"
+          ],
+          "Elastic IP - SR": [
+            "AWS - Allocate Elastic IP"
+          ],
+          "EC2 Management - CR": [
+            "AWS - Terminate EC2 Instance",
+            "AWS - Start EC2 Instance",
+            "AWS - Stop EC2 Instance",
+            "AWS - Restart EC2 Instance",
+            "AWS - Resize/Change EC2 Instance"
+          ],
+          "EC2 Migration - CR": [
+            "AWS - Migrate/Clone EC2 Instance"
+          ],
+          "Auto Scaling - CR": [
+            "AWS - Modify Auto Scaling Configuration",
+            "AWS - Update Auto Scaling Launch Template / AMI"
+          ],
+          "Scheduling - CR": [
+            "AWS - Modify Automatic Start/Stop Schedule"
+          ],
+          "Elastic IP - CR": [
+            "AWS - Associate / Disassociate Elastic IP"
+          ]
+        },
+        "AWS - Storage": {
+          "EBS - SR": [
+            "AWS - Create EBS Volume"
+          ],
+          "Snapshot - SR": [
+            "AWS - Create Snapshot",
+            "AWS - Restore Snapshot"
+          ],
+          "S3 - SR": [
+            "AWS - Create S3 Bucket"
+          ],
+          "S3 Mount": [
+            "AWS - Configure S3 Mount"
+          ],
+          "EBS - CR": [
+            "AWS - Increase EBS Volume"
+          ],
+          "Snapshot - CR": [
+            "AWS - Copy / Share Snapshot"
+          ],
+          "S3 - CR": [
+            "AWS - Configure Bucket Policy",
+            "AWS - Configure Lifecycle Policy",
+            "AWS - Configure Replication"
+          ]
+        },
+        "AWS - Networking": {
+          "VPC": [
+            "AWS - Create VPC"
+          ],
+          "Subnet": [
+            "AWS - Create Subnet"
+          ],
+          "VPC Peering": [
+            "AWS - Configure VPC Peering"
+          ],
+          "VPC Endpoint": [
+            "AWS - Configure VPC Endpoint"
+          ],
+          "Route 53 - SR": [
+            "AWS - Configure DNS Record"
+          ],
+          "Load Balancer - SR": [
+            "AWS - Create Load Balancer"
+          ],
+          "VPN": [
+            "AWS - Configure Site-to-Site VPN",
+            "AWS - Configure VPN Server"
+          ],
+          "VPN User Management": [
+            "AWS - Create / Reset VPN User"
+          ],
+          "Certificate Manager": [
+            "AWS - Configure ACM Certificate"
+          ],
+          "CloudFront": [
+            "AWS - Configure CloudFront Distribution"
+          ],
+          "WAF - SR": [
+            "AWS - Configure AWS WAF"
+          ],
+          "Security Group": [
+            "AWS - Modify Security Group Rules"
+          ],
+          "Route Table": [
+            "AWS - Configure Route Table"
+          ],
+          "Route 53 - CR": [
+            "AWS - Modify DNS Record"
+          ],
+          "Load Balancer - CR": [
+            "AWS - Modify Load Balancer Configuration/Rules"
+          ],
+          "WAF - CR": [
+            "AWS - Modify AWS WAF Rules"
+          ]
+        },
+        "AWS - IAM and Security": {
+          "IAM - SR": [
+            "AWS - Create IAM User",
+            "AWS - Reset IAM Password",
+            "AWS - Enable MFA",
+            "AWS - Create IAM Role"
+          ],
+          "IAM_Security - SR": [
+            "AWS - Configure CloudTrail",
+            "AWS - Configure GuardDuty",
+            "AWS - Vulnerability Assessment",
+            "AWS - Security Audit"
+          ],
+          "IAM - CR": [
+            "AWS - Delete IAM User",
+            "AWS - Modify IAM Permissions"
+          ]
+        },
+        "AWS - Monitoring": {
+          "CloudWatch - SR": [
+            "AWS - Configure CloudWatch Metrics",
+            "AWS - Configure CloudWatch Dashboard",
+            "AWS - Configure CloudWatch Alarm"
+          ],
+          "VPC Flow Logs - SR": [
+            "AWS - Enable VPC Flow Logs"
+          ],
+          "WAF Logging - SR": [
+            "AWS - Enable WAF Logging"
+          ],
+          "CloudFront Logging - SR": [
+            "AWS - Enable CloudFront Logging"
+          ],
+          "Load Balancer Logging - SR": [
+            "AWS - Enable Load Balancer Logging"
+          ],
+          "Alert Management - IR": [
+            "AWS - Investigate/Analyse Monitoring Alert"
+          ]
+        },
+        "AWS - Backup and Recovery": {
+          "Backup - SR": [
+            "AWS - Configure AWS Backup",
+            "AWS - Backup Verification",
+            "AWS - Restore Backup"
+          ],
+          "Disaster Recovery - SR": [
+            "AWS - Disaster Recovery Drill"
+          ],
+          "Disaster Recovery - IR": [
+            "AWS - Disaster Recovery Failover"
+          ]
+        },
+        "AWS - Messaging": {
+          "Amazon SES": [
+            "AWS - Configure Amazon SES"
+          ]
+        },
+        "Server Management": {
+          "Server Operations - SR": [
+            "Server - Health Check"
+          ],
+          "User Management - SR": [
+            "Server - Create User",
+            "Server - Reset User Password",
+            "Server - Unlock User Account"
+          ],
+          "Storage Management - SR": [
+            "Server - Storage Analysis / Cleanup"
+          ],
+          "Log Analysis - IR": [
+            "Server - Event Log Analysis"
+          ],
+          "Monitoring - IR": [
+            "Server - High CPU / Memory Usage",
+            "Server - Disk Space Full"
+          ],
+          "VDI - IR": [
+            "VDI - Restart Virtual Desktop"
+          ],
+          "Server Operations - CR": [
+            "Server - Start",
+            "Server - Stop",
+            "Server - Restart"
+          ],
+          "Software Management - CR": [
+            "Server - Install Package / Software",
+            "Server - Uninstall Package / Software"
+          ],
+          "Configuration Management - CR": [
+            "Server - Operating System Configuration Update",
+            "Server - Service Configuration Update"
+          ],
+          "Task Scheduler - CR": [
+            "Server - Configure Cron Job / Scheduled Task"
+          ],
+          "File Transfer - CR": [
+            "Server - Configure FTP / SFTP"
+          ],
+          "File Permissions - CR": [
+            "Server - Modify File / Folder Permissions"
+          ],
+          "Log Management - CR": [
+            "Server - Clear Log Files"
+          ],
+          "Patch Management - CR": [
+            "Server - Apply OS Patch Updates"
+          ],
+          "Server Performance - CR": [
+            "Server - Configure Swap Memory",
+            "Server - Performance Tuning"
+          ],
+          "OS Configuration - CR": [
+            "Server - Change Time Zone"
+          ],
+          "Server Storage - CR": [
+            "Website - Renew SSL Certificate"
+          ]
+        },
+        "Database": {
+          "Amazon RDS": [
+            "AWS - Create Amazon RDS Instance"
+          ],
+          "Database Administration": [
+            "Database - Create Database",
+            "Database - Create User",
+            "Database - Reset User Password"
+          ],
+          "Database Backup": [
+            "Database - Configure Backup",
+            "Database - Configure Backup to Amazon S3",
+            "Database - Restore Backup"
+          ],
+          "Database Migration": [
+            "Database - Migrate Database"
+          ],
+          "Database  Health": [
+            "Database - Health Check"
+          ],
+          "Database Maintenance": [
+            "Database - Create SQL Job"
+          ],
+          "Database Monitoring - IR": [
+            "Database - Performance Issue",
+            "Database - Backup Failure"
+          ],
+          "DB - Amazon RDS": [
+            "AWS - Modify Amazon RDS Instance"
+          ],
+          "DB - User Management": [
+            "Database - Modify User Permissions"
+          ],
+          "DB - Configuration Management": [
+            "Database - Configuration File Update"
+          ],
+          "DB - Services": [
+            "Database - Restart Database Service"
+          ],
+          "DB - Performance": [
+            "Database - Performance Tuning"
+          ],
+          "DB - Maintenance": [
+            "Database - Modify SQL Job",
+            "Database - Index Maintenance"
+          ]
+        },
+        "Application": {
+          "Application - Deployment": [
+            "Application - Deploy / Migrate Application"
+          ],
+          "Application - Monitoring": [
+            "Application - Application Not Working"
+          ],
+          "App - Deployment": [
+            "Application - Update/Clone Application"
+          ],
+          "Application - Services": [
+            "Application - Start Application Service",
+            "Application - Stop Application Service",
+            "Application - Restart Application Service"
+          ]
+        },
+        "Website": {
+          "Website SSL - SR": [],
+          "Website SSL - CR": [],
+          "Website Hosting": [
+            "Website - Re-host / Migrate Website"
+          ],
+          "Website Licensing": [
+            "Website - Renew Plesk License"
+          ],
+          "Website Monitoring": [
+            "Website - Website Down",
+            "Website - Website Running Slow"
+          ],
+          "Website Configuration": [
+            "Website - Web Server Configuration Update",
+            "Website - Configure Virtual Host"
+          ]
+        },
+        "Billing and Support": {
+          "Cost Management": [
+            "AWS - Reserved Instance Purchase / Modification / Renewal"
+          ],
+          "Billing": [
+            "AWS - Billing and Usage Report"
+          ],
+          "Support": [
+            "AWS - Create AWS Support Case"
+          ],
+          "Account Management": [
+            "AWS - AWS Account Reactivation"
+          ]
+        },
+        "Domain Management": {
+          "Domain Registration": [
+            "Domain - Register Domain"
+          ],
+          "Domain Renewal": [
+            "Domain - Renew Domain"
+          ],
+          "Domain Transfer": [
+            "Domain - Transfer Domain"
+          ],
+          "DNS Management - SR": [
+            "Domain - Create DNS Record"
+          ],
+          "DNS Management - CR": [
+            "Domain - Modify DNS Record"
+          ]
+        }
+      },
+      "Change Request": {
+        "AWS - Compute": {
+          "EC2 Management - CR": [
+            "AWS - Terminate EC2 Instance",
+            "AWS - Start EC2 Instance",
+            "AWS - Stop EC2 Instance",
+            "AWS - Restart EC2 Instance",
+            "AWS - Resize/Change EC2 Instance"
+          ],
+          "EC2 Migration - CR": [
+            "AWS - Migrate/Clone EC2 Instance"
+          ],
+          "Auto Scaling - CR": [
+            "AWS - Modify Auto Scaling Configuration",
+            "AWS - Update Auto Scaling Launch Template / AMI"
+          ],
+          "Scheduling - CR": [
+            "AWS - Modify Automatic Start/Stop Schedule"
+          ],
+          "Elastic IP - CR": [
+            "AWS - Associate / Disassociate Elastic IP"
+          ]
+        },
+        "AWS - Storage": {
+          "EBS - CR": [
+            "AWS - Increase EBS Volume"
+          ],
+          "Snapshot - CR": [
+            "AWS - Copy / Share Snapshot"
+          ],
+          "S3 - CR": [
+            "AWS - Configure Bucket Policy",
+            "AWS - Configure Lifecycle Policy",
+            "AWS - Configure Replication"
+          ]
+        },
+        "AWS - Networking": {
+          "Security Group": [
+            "AWS - Modify Security Group Rules"
+          ],
+          "Route Table": [
+            "AWS - Configure Route Table"
+          ],
+          "Route 53 - CR": [
+            "AWS - Modify DNS Record"
+          ],
+          "Load Balancer - CR": [
+            "AWS - Modify Load Balancer Configuration/Rules"
+          ],
+          "WAF - CR": [
+            "AWS - Modify AWS WAF Rules"
+          ]
+        },
+        "AWS - IAM and Security": {
+          "IAM - CR": [
+            "AWS - Delete IAM User",
+            "AWS - Modify IAM Permissions"
+          ]
+        },
+        "Server Management": {
+          "Server Operations - CR": [
+            "Server - Start",
+            "Server - Stop",
+            "Server - Restart"
+          ],
+          "Software Management - CR": [
+            "Server - Install Package / Software",
+            "Server - Uninstall Package / Software"
+          ],
+          "Configuration Management - CR": [
+            "Server - Operating System Configuration Update",
+            "Server - Service Configuration Update"
+          ],
+          "Task Scheduler - CR": [
+            "Server - Configure Cron Job / Scheduled Task"
+          ],
+          "File Transfer - CR": [
+            "Server - Configure FTP / SFTP"
+          ],
+          "File Permissions - CR": [
+            "Server - Modify File / Folder Permissions"
+          ],
+          "Log Management - CR": [
+            "Server - Clear Log Files"
+          ],
+          "Patch Management - CR": [
+            "Server - Apply OS Patch Updates"
+          ],
+          "Server Performance - CR": [
+            "Server - Configure Swap Memory",
+            "Server - Performance Tuning"
+          ],
+          "OS Configuration - CR": [
+            "Server - Change Time Zone"
+          ]
+        },
+        "Database": {
+          "DB - Amazon RDS": [
+            "AWS - Modify Amazon RDS Instance"
+          ],
+          "DB - User Management": [
+            "Database - Modify User Permissions"
+          ],
+          "DB - Configuration Management": [
+            "Database - Configuration File Update"
+          ],
+          "DB - Services": [
+            "Database - Restart Database Service"
+          ],
+          "DB - Performance": [
+            "Database - Performance Tuning"
+          ],
+          "DB - Maintenance": [
+            "Database - Modify SQL Job",
+            "Database - Index Maintenance"
+          ]
+        },
+        "Application": {
+          "App - Deployment": [
+            "Application - Update/Clone Application"
+          ],
+          "Application - Services": [
+            "Application - Start Application Service",
+            "Application - Stop Application Service",
+            "Application - Restart Application Service"
+          ]
+        },
+        "Website": {
+          "Website Hosting": [
+            "Website - Re-host / Migrate Website"
+          ],
+          "Website Licensing": [
+            "Website - Renew Plesk License"
+          ],
+          "Website Configuration": [
+            "Website - Web Server Configuration Update",
+            "Website - Configure Virtual Host"
+          ]
+        },
+        "Domain Management": {
+          "DNS Management - CR": [
+            "Domain - Modify DNS Record"
+          ]
+        }
+      },
+      "Incident Request": {
+        "AWS - Monitoring": {
+          "Alert Management - IR": [
+            "AWS - Investigate/Analyse Monitoring Alert"
+          ]
+        },
+        "AWS - Backup and Recovery": {
+          "Disaster Recovery - IR": [
+            "AWS - Disaster Recovery Failover"
+          ]
+        },
+        "Server Management": {
+          "Log Analysis - IR": [
+            "Server - Event Log Analysis"
+          ],
+          "Monitoring - IR": [
+            "Server - High CPU / Memory Usage",
+            "Server - Disk Space Full"
+          ],
+          "VDI - IR": [
+            "VDI - Restart Virtual Desktop"
+          ]
+        },
+        "Database": {
+          "Database Monitoring - IR": [
+            "Database - Performance Issue",
+            "Database - Backup Failure"
+          ]
+        },
+        "Application": {
+          "Application - Monitoring": [
+            "Application - Application Not Working"
+          ]
+        },
+        "Website": {
+          "Website Monitoring": [
+            "Website - Website Down",
+            "Website - Website Running Slow"
+          ]
+        }
+      }
+    },
+    "pending": false,
+    "fallbackDepartment": null
+  },
+  "Dev_Ops": {
+    "hasTaskLevel": false,
+    "tree": {
+      "Service Request": {
+        "Infrastructure and Environment Setup - Service": [
+          "Create Environment",
+          "Create Kubernetes CronJobs",
+          "Create Kubernetes Deployment",
+          "Create Kubernetes Service",
+          "Create Kubernetes Ingress",
+          "Configure Kubernetes Autoscaling (HPA)",
+          "Create Worker Node Server",
+          "Add Worker Node to Cluster"
+        ],
+        "CI/CD - Service": [
+          "Build CI/CD Pipeline",
+          "Configure Automated Deployment",
+          "Configure Webhooks"
+        ],
+        "Container Management - Service": [
+          "Build Docker Image",
+          "Push Image to Registry",
+          "Create Private Docker Registry",
+          "Configure Docker Image Cleanup"
+        ],
+        "Compute - Service": [
+          "Create EC2 Instances",
+          "Upgrade EC2 Instance Types"
+        ],
+        "Storage - Service": [
+          "Upgrade EBS Volumes",
+          "Configure EBS Snapshots",
+          "Create S3 Bucket",
+          "Manage S3 Files",
+          "Retrieve Files from Pods"
+        ],
+        "Database - Service": [
+          "Configure Database Backups",
+          "Create RDS Instance",
+          "Setup Aurora Cluster",
+          "Setup MongoDB Atlas",
+          "Configure Database Read Replica"
+        ],
+        "Monitoring - Service": [
+          "Configure CloudWatch Monitoring",
+          "Setup Prometheus Monitoring",
+          "Create Grafana Dashboard",
+          "Configure Alert Rules"
+        ],
+        "Logging - Service": [
+          "Configure Centralized Logging",
+          "Enable Container Logs Collection"
+        ],
+        "Access Management - Service": [
+          "Grant Server SSH Access",
+          "Revoke Server Access",
+          "Create New IAM User",
+          "Create IAM Role"
+        ],
+        "Networking - Service": [
+          "Create DNS Record",
+          "Configure ALB",
+          "Configure CloudFront Distribution",
+          "Configure WAF Rules",
+          "Open Firewall Port"
+        ],
+        "Security - Service": [
+          "Request SSL Certificate (ACM)",
+          "Attach SSL Certificate"
+        ],
+        "Deployment - Service": [
+          "Deploy New Version",
+          "Restart Application Service",
+          "Rollback Application Version"
+        ],
+        "Monitoring and Logs - Service": [
+          "Provide Application Logs"
+        ],
+        "Documentation / Audit - Service": [
+          "Provide Architecture Documentation",
+          "Provide Deployment Documentation"
+        ],
+        "IaC and GitOps - Service": [
+          "Setup Terraform Infrastructure",
+          "Setup ArgoCD / GitOps Pipeline",
+          "Deploy Helm Chart",
+          "Setup Flux CD",
+          "Create Terraform Module",
+          "Setup Terragrunt"
+        ],
+        "Kubernetes Advanced - Service": [
+          "Setup Service Mesh (Istio/Linkerd)",
+          "Configure Network Policies",
+          "Setup RBAC for Kubernetes",
+          "Configure Pod Disruption Budgets",
+          "Setup Cluster Autoscaler",
+          "Configure Vertical Pod Autoscaler (VPA)",
+          "Setup Kubernetes Dashboard",
+          "Configure Kubernetes Secrets Management",
+          "Setup Velero Backup for Kubernetes",
+          "Multi-Cluster Kubernetes Federation"
+        ],
+        "AWS Managed Services - Service": [
+          "Create EKS Cluster",
+          "Setup ECS Cluster and Service",
+          "Deploy AWS Lambda Function",
+          "Setup API Gateway",
+          "Setup SQS Queue",
+          "Setup SNS Topic",
+          "Setup ElastiCache (Redis/Memcached)",
+          "Configure AWS Secrets Manager",
+          "Setup AWS Parameter Store",
+          "Configure AWS Backup",
+          "Setup MSK (Managed Kafka)"
+        ],
+        "Networking and VPC - Service": [
+          "Create VPC with Subnets",
+          "Configure VPC Peering",
+          "Setup AWS Transit Gateway",
+          "Configure Site-to-Site VPN",
+          "Setup AWS Direct Connect",
+          "Configure Route 53 Hosted Zone"
+        ],
+        "Security and Compliance - Service": [
+          "Setup AWS GuardDuty",
+          "Configure AWS Security Hub",
+          "Setup AWS Config Rules",
+          "Configure HashiCorp Vault",
+          "Setup Container Image Scanning",
+          "Configure KMS Key Management"
+        ],
+        "Observability - Service": [
+          "Setup Distributed Tracing (Jaeger/Tempo)",
+          "Configure OpenTelemetry Collector",
+          "Setup Loki Log Aggregation",
+          "Configure Uptime Monitoring",
+          "Setup Cost Monitoring (AWS Cost Explorer / Kubecost)"
+        ],
+        "DevOps Tooling - Service": [
+          "Setup SonarQube Code Analysis",
+          "Configure Artifactory / Nexus Repository",
+          "Setup Vault Secret Injection in CI/CD",
+          "Configure GitHub Actions Workflows",
+          "Setup GitLab CI Pipeline",
+          "Configure Dependency Vulnerability Scanning",
+          "Setup Blue-Green Deployment Strategy",
+          "Setup Canary Deployment Strategy",
+          "Configure Multi-Environment Pipeline"
+        ]
+      },
+      "Change Request": {
+        "Configuration Changes -Change": [
+          "Update Environment Variables",
+          "Modify Permissions",
+          "Update PHP Configuration"
+        ],
+        "Infrastructure Changes -Change": [
+          "Upgrade Instance Type",
+          "Resize Storage Volume",
+          "Scale Kubernetes Nodes"
+        ],
+        "Application Changes -Change": [
+          "Rollback Application Version",
+          "Update Application Version"
+        ],
+        "CI/CD Changes -Change": [
+          "Rebuild Docker Image",
+          "Update Jenkins Pipeline"
+        ],
+        "Container / Image Changes -Change": [
+          "Modify Docker Images",
+          "Update Container Service Versions"
+        ],
+        "Monitoring Changes -Change": [
+          "Update Prometheus Scrape Config",
+          "Modify Grafana Dashboard"
+        ],
+        "Security Changes -Change": [
+          "Update IAM Policies",
+          "Update Security Group Rules",
+          "Rotate SSL/TLS Certificates",
+          "Update Vault Policies / Token Roles",
+          "Update Container Image Base Version"
+        ],
+        "Networking Changes -Change": [
+          "Modify ALB Rules",
+          "Update WAF Rules",
+          "Update DNS Record"
+        ],
+        "IaC and GitOps -Change": [
+          "Update Terraform Variables / State",
+          "Update Helm Chart Values",
+          "Modify ArgoCD Application Config",
+          "Migrate Kubernetes Manifests to Helm",
+          "Refactor Terraform to Use Modules"
+        ],
+        "Kubernetes -Change": [
+          "Upgrade Kubernetes Cluster Version",
+          "Update Kubernetes RBAC Policies",
+          "Modify Resource Quotas / Limit Ranges",
+          "Update Kubernetes Network Policies",
+          "Reconfigure Ingress Rules",
+          "Update Container Resource Limits"
+        ],
+        "AWS and Cloud -Change": [
+          "Modify AWS Auto Scaling Policy",
+          "Update S3 Bucket Policy / ACL",
+          "Rotate IAM Access Keys / Credentials",
+          "Update CloudFront Cache Behaviours",
+          "Modify RDS Parameter Group",
+          "Update Lambda Function Configuration",
+          "Modify SQS / SNS Configuration",
+          "Enable Cross-Region Replication (S3/RDS)"
+        ],
+        "CI/CD and Tooling -Change": [
+          "Add New Stage to CI/CD Pipeline",
+          "Update Deployment Environment Variables in Pipeline",
+          "Upgrade CI/CD Tool Version (Jenkins/GitLab)",
+          "Configure Pipeline Approval Gates"
+        ],
+        "Cost Optimisation -Change": [
+          "Rightsize EC2 / RDS Instances",
+          "Configure S3 Lifecycle Policies",
+          "Enable Spot Instances for Non-Critical Workloads",
+          "Schedule Dev/Staging Resource Shutdown"
+        ]
+      },
+      "Incident Request": {
+        "Infrastructure / Resource Issues -Incident": [
+          "Staging Storage Full",
+          "OOM Errors",
+          "High CPU Usage",
+          "Disk Space Full",
+          "Worker Node Not Responding",
+          "Node Not Ready",
+          "Pod Pending"
+        ],
+        "Application / Process Failures -Incident": [
+          "Cron Jobs Not Running",
+          "Application Down",
+          "Container CrashLoopBackOff",
+          "Image Pull BackOff"
+        ],
+        "CI/CD Issues -Incident": [
+          "Jenkins Pipeline Failures",
+          "Docker Build Failure",
+          "Deployment Failure"
+        ],
+        "Performance Issues -Incident": [
+          "Backend Standby During Builds",
+          "Application Slow"
+        ],
+        "Networking Issues -Incident": [
+          "ALB Returning 502/504",
+          "DNS Not Resolving",
+          "CloudFront 403/503 Errors"
+        ],
+        "Database Issues -Incident": [
+          "Database Connection Failure",
+          "Database High CPU"
+        ],
+        "Security Issues -Incident": [
+          "Unauthorized Login Attempt",
+          "WAF Blocking Legitimate Requests"
+        ],
+        "Kubernetes / Container -Incident": [
+          "ArgoCD Out of Sync / Stuck",
+          "Helm Release Failure",
+          "Kubernetes API Server Unreachable",
+          "Persistent Volume Claim Stuck Pending",
+          "Kubernetes Certificate Expiry",
+          "Namespace Resource Quota Exceeded",
+          "Init Container Stuck",
+          "Kubernetes Cluster Upgrade Failure"
+        ],
+        "AWS Services -Incident": [
+          "Lambda Function Timeout / Error",
+          "SQS Queue Backlog / Consumer Lag",
+          "ElastiCache / Redis Connection Failure",
+          "ECS Task Failing to Start",
+          "AWS Service Limit / Quota Reached",
+          "Spot Instance Termination Causing Outage",
+          "RDS Failover / Multi-AZ Issue",
+          "ECR Push / Pull Access Denied",
+          "Terraform State Lock"
+        ],
+        "Networking and Security -Incident": [
+          "VPN Tunnel Down",
+          "Security Group Misconfiguration Blocking Traffic",
+          "SSL Certificate Expired",
+          "IAM Permission Denied Causing Service Failure",
+          "Subnet IP Address Exhaustion",
+          "GuardDuty Threat Alert"
+        ],
+        "CI/CD and IaC -Incident": [
+          "Terraform Apply Failure / Drift",
+          "GitHub Actions / GitLab CI Runner Down",
+          "Vault Token Expired / Sealed",
+          "SonarQube Quality Gate Blocking Pipeline"
+        ]
+      }
+    },
+    "pending": false,
+    "fallbackDepartment": null
+  },
+  "IT Infra": {
+    "hasTaskLevel": false,
+    "pending": true,
+    "fallbackDepartment": "Cloud Infra",
+    "tree": {
+      "Service Request": {
+        "BDR Suite and Cloud Backup - Service": [
+          "BDR Agent Installation on Server Workstation",
+          "Backup Job Creation Full Incremental Differential",
+          "Cloud Storage Integration Wasabi S3 Azure Blob",
+          "Backup Retention Policy Configuration",
+          "Offsite Immutable Backup Configuration",
+          "Backup Monitoring and Alert Setup",
+          "Backup Verification Test Restore Setup",
+          "Disaster Recovery DR Plan Documentation",
+          "PhysicaltoCloud P2C Backup Configuration",
+          "iDrive Backup Account Setup and Configuration",
+          "iDrive Backup Schedule and Retention Setup",
+          "Wasabi Cloud Storage Bucket Creation",
+          "Wasabi IAM User and Access Policy Setup",
+          "CrossRegion MultiCloud Backup Replication"
+        ],
+        "Entra ID (Identity and Access) -Service": [
+          "Entra ID Tenant Setup and Initial Configuration",
+          "User Account Creation in Entra ID",
+          "Group Creation and Dynamic Membership Rules",
+          "MFA Enrollment and Conditional Access Setup",
+          "App Registration and Enterprise App Configuration",
+          "Hybrid AD Connect Setup OnPrem AD Sync",
+          "RBAC Role Assignment",
+          "SelfService Password Reset SSPR Configuration",
+          "Privileged Identity Management PIM Setup",
+          "Guest B2B User Invitation",
+          "Identity Protection Policy Configuration",
+          "Access Package Creation Entitlement Management"
+        ],
+        "Firewall and Network Security -Service": [
+          "Firewall Initial Setup and Configuration",
+          "Firewall Policy Rule Creation",
+          "VLAN Creation and Segmentation",
+          "SitetoSite VPN Tunnel Configuration",
+          "SSL Remote Access VPN Setup",
+          "Intrusion Prevention System IPS Profile Setup",
+          "Web Content Filtering Policy",
+          "Firewall Log Forwarding to SIEM",
+          "QoS and Bandwidth Management Configuration",
+          "Firewall HA High Availability Setup",
+          "ZeroTier Network Setup and Configuration",
+          "ZeroTier Network Member Authorization",
+          "ZeroTier Route Configuration",
+          "DNS Filtering and Threat Intelligence Setup"
+        ],
+        "Intune (Device Management) -Service": [
+          "Intune Tenant Setup and MDM Authority Configuration",
+          "Windows Autopilot Enrollment Profile Setup",
+          "Device Compliance Policy Creation",
+          "Configuration Profile Deployment",
+          "App Deployment and Management via Intune",
+          "Mobile Device Enrollment iOS Android",
+          "Endpoint Security Policies Defender BitLocker",
+          "Update Ring Windows Update Policy Setup",
+          "Conditional Access Policy Integration with Intune",
+          "Remote Wipe Factory Reset Capability Setup",
+          "Intune RBAC Role Assignment"
+        ],
+        "Mail Migration and Services -Service": [
+          "Google Workspace to M365 PreMigration Assessment",
+          "M365 Tenant Setup for Mail Migration",
+          "User Provisioning and License Assignment M365",
+          "Google Workspace to M365 Mailbox Migration",
+          "Shared Drive Google Drive to SharePoint Migration",
+          "MX Record Cutover to M365",
+          "PostMigration Validation and Testing",
+          "Mail Flow Rules and Transport Policy Setup",
+          "Email Signature Management Deployment",
+          "Google Workspace Decommission Planning",
+          "Spam Filter and AntiPhishing Policy Configuration"
+        ],
+        "Mail Support -Service": [
+          "New Mailbox Creation M365 Exchange Online",
+          "Shared Mailbox Creation and Access Grant",
+          "Distribution List Group Creation",
+          "Email Alias Addition",
+          "Mail Forwarding Configuration",
+          "Email Archiving Retention Policy Setup",
+          "Email Domain Addition and Verification",
+          "SPF DKIM DMARC Configuration",
+          "Outlook Profile Setup and Configuration",
+          "Bulk User Mailbox Provisioning",
+          "Email Encryption SMIME OME Setup"
+        ],
+        "NAS Storage Management -Service": [
+          "NAS Device Initial Setup and Configuration",
+          "RAID Configuration and Volume Creation",
+          "Network Share SMB NFS Creation",
+          "User and Group ACL Configuration on NAS",
+          "Active Directory Integration with NAS",
+          "NAS Snapshot Schedule Configuration",
+          "NAS Backup to Cloud Wasabi iDrive S3",
+          "iSCSI iSER Target Configuration",
+          "NAS Capacity Expansion Drive Addition",
+          "NAStoNAS Replication Setup",
+          "Quota Management Setup",
+          "NAS SSL Certificate Installation"
+        ],
+        "On-Prem Server Deployment -Service": [
+          "Physical Server Rack and Stack",
+          "RAID Storage Controller Configuration",
+          "OS Installation and Baseline Configuration",
+          "Active Directory Domain Setup",
+          "Domain Controller Promotion Addition",
+          "HyperV VMware ESXi Hypervisor Setup",
+          "Virtual Machine VM Provisioning on HyperVESXi",
+          "File Server Setup and Configuration",
+          "Print Server Configuration",
+          "DHCP Server Setup and Scope Configuration",
+          "DNS Server Configuration",
+          "IPMI iDRAC iLO Remote Management Setup",
+          "Server Monitoring Agent Deployment"
+        ],
+        "Seqrite Endpoint Protection -Service": [
+          "Seqrite EPS Server Installation and Configuration",
+          "Endpoint Agent Deployment Windows Linux Mac",
+          "Antivirus Policy Creation and Assignment",
+          "Endpoint Group and Department Structure Setup",
+          "Data Loss Prevention DLP Policy Configuration",
+          "Web Security and URL Filtering Setup",
+          "Application Control Policy",
+          "Patch Management Configuration",
+          "Endpoint Compliance and Vulnerability Scan Setup",
+          "EPS Dashboard and Alert Report Configuration",
+          "Seqrite License Addition Renewal"
+        ],
+        "SharePoint and Collaboration -Service": [
+          "SharePoint Online Site Collection Creation",
+          "SharePoint Team Site Setup for Department",
+          "SharePoint Document Library Configuration",
+          "SharePoint Permissions and Access Level Setup",
+          "SharePoint to OneDrive Migration",
+          "Power Automate Flow for SharePoint",
+          "SharePoint Hub Site Configuration",
+          "SharePoint External Sharing Policy Configuration",
+          "SharePoint Search and Metadata Configuration",
+          "Microsoft Teams Channel and SharePoint Integration",
+          "SharePoint Online Storage Quota Management"
+        ]
+      },
+      "Change Request": {
+        "BDR Suite and Cloud Backup - Change": [
+          "Backup Job Schedule Modification",
+          "Cloud Target Storage Bucket Change",
+          "BDR Agent Version Upgrade",
+          "iDrive Storage Plan Upgrade",
+          "Wasabi Bucket Policy CORS Rule Update",
+          "Backup Retention Policy Change",
+          "DR Test Execution and Documentation Update",
+          "Wasabi Lifecycle Rule Configuration"
+        ],
+        "Entra ID (Identity and Access) - Change": [
+          "User Account Modification Attribute License Update",
+          "Conditional Access Policy Update",
+          "App Registration Client Secret Certificate Rotation",
+          "IAM User Offboarding Account Deletion",
+          "Named Location Trusted IP Update",
+          "PIM Role Assignment Modification",
+          "Password Policy Authentication Method Update",
+          "Group Membership Modification",
+          "Entra ID Domain Addition Removal"
+        ],
+        "Firewall and Network Security - Change": [
+          "Firewall Rule Addition Modification",
+          "VPN Configuration Update Phase Certificate",
+          "Firewall Firmware OS Upgrade",
+          "ZeroTier Network Rule Update",
+          "VLAN Network Segmentation Change",
+          "Web Filtering Category Update",
+          "SSLVPN User Certificate Renewal",
+          "ZeroTier SelfHosted Controller Migration",
+          "NAT Policy Port Forwarding Change"
+        ],
+        "Intune (Device Management) - Change": [
+          "Device Compliance Policy Update",
+          "App Deployment Policy Update",
+          "Windows Update Ring Modification",
+          "Configuration Profile Update",
+          "Endpoint Security Policy Modification",
+          "Intune Scope Tag RBAC Update",
+          "Device Retirement Wipe from Intune"
+        ],
+        "Mail Migration and Services - Change": [
+          "MX Record Cutover Planning and Execution",
+          "Migration Batch Configuration Update",
+          "Email Routing Connector Update",
+          "Google Workspace Decommission Final Cutover"
+        ],
+        "Mail Support - Change": [
+          "Mailbox Size Quota Increase",
+          "Mail Flow Rule Transport Rule Update",
+          "Email Domain Primary Default Change",
+          "AntiSpam AntiPhishing Policy Modification",
+          "DKIM Key Rotation",
+          "Shared Mailbox Permission Change",
+          "Distribution Group Membership Update",
+          "Email Archiving Retention Tag Update"
+        ],
+        "NAS Storage Management - Change": [
+          "NAS Share Permission Modification",
+          "NAS Quota Adjustment",
+          "NAS Snapshot Retention Policy Change",
+          "NAS Firmware Upgrade",
+          "Cloud Sync Task Modification Wasabi iDrive",
+          "NAS Volume Expansion Drive Replacement",
+          "iSCSI LUN Size Expansion"
+        ],
+        "On-Prem Server Deployment - Change": [
+          "Windows Server OS Patch Update",
+          "Server RAM CPU Upgrade",
+          "VM Resource Reallocation vCPU RAM",
+          "Active Directory Group Policy Update GPO",
+          "Server IP Network Configuration Change",
+          "HyperV ESXi Host Firmware Update",
+          "Server Decommission and Data Archival"
+        ],
+        "Seqrite Endpoint Protection - Change": [
+          "AV Policy Update Scan Schedule Exclusions",
+          "DLP Policy Rule Modification",
+          "Seqrite EPS Server Upgrade",
+          "Endpoint Group Department Restructure",
+          "Application Whitelist Blacklist Update",
+          "Patch Management Policy Update"
+        ],
+        "SharePoint and Collaboration - Change": [
+          "SharePoint Site Permission Change",
+          "SharePoint External Sharing Policy Update",
+          "Document Library Metadata Content Type Update",
+          "SharePoint Hub Site Association Change",
+          "Power Automate Flow Update",
+          "OneDrive Storage Quota Increase",
+          "Teams Channel SharePoint Site Archival"
+        ]
+      },
+      "Incident Request": {
+        "BDR Suite and Cloud Backup -Incident": [
+          "Backup Job Failed Critical Data Not Protected",
+          "Cloud Backup Upload Failure Wasabi S3",
+          "Recovery Point Missing Backup Deleted",
+          "iDrive Backup Sync Stopped Failed",
+          "Wasabi Bucket Access Denied Alert",
+          "Emergency Data Restore Request",
+          "Ransomware Attack Backup Integrity Check",
+          "BDR Server Console Unresponsive",
+          "Wasabi Storage Quota Exceeded Alert"
+        ],
+        "Entra ID (Identity and Access) -Incident": [
+          "User Unable to Sign In Entra ID Account Locked",
+          "MFA Prompt Loop Authentication Failure",
+          "Conditional Access Policy Blocking Legitimate User",
+          "Suspected Account Compromise Risky SignIn Alert",
+          "AD Connect Sync Failure Hybrid Environments",
+          "App Registration Token Secret Expired",
+          "Guest User Access Issue",
+          "PIM Role Activation Failure",
+          "Bulk User Deletion Accidental Removal Alert"
+        ],
+        "Firewall and Network Security -Incident": [
+          "Firewall Policy Blocking Critical Business Traffic",
+          "SitetoSite VPN Tunnel Down",
+          "DDoS Volumetric Attack Alert",
+          "Intrusion Detection Alert Active Threat",
+          "Firewall Hardware Failure HA Failover",
+          "ZeroTier Node Disconnected Network Unreachable",
+          "Unauthorized Access Attempt Detected",
+          "Internet Connectivity Outage at Site",
+          "SSLVPN Remote Access Failure",
+          "VLAN Routing Issue InterVLAN Traffic Blocked"
+        ],
+        "Intune (Device Management) -Incident": [
+          "Device Compliance Failure M365 Access Blocked",
+          "Intune App Deployment Failure",
+          "Windows Autopilot Enrollment Failure",
+          "BitLocker Key Escrow Missing Recovery Needed",
+          "Intune Policy Sync Failure on Device",
+          "Remote Wipe Failure LostStolen Device",
+          "Windows Update Deployment Failure via Intune"
+        ],
+        "Mail Migration and Services -Incident": [
+          "Mail Flow Broken After MX Cutover",
+          "Mailbox Data Missing PostMigration",
+          "Migration Batch Failure",
+          "Duplicate Emails After Migration"
+        ],
+        "Mail Support -Incident": [
+          "Email Not Received Delivery Failure",
+          "Email Marked as Spam Phishing False Positive",
+          "Outlook Application Not Connecting to M365",
+          "Phishing Malicious Email Reported",
+          "Mailbox Over Quota Storage Full",
+          "Email Authentication Failure SPF DKIM DMARC",
+          "Shared Mailbox Access Denied",
+          "Mass Email Spoofing Incident",
+          "Exchange Online Service Degradation"
+        ]
+      }
+    }
+  },
+  "Tally Support": {
+    "hasTaskLevel": false,
+    "pending": true,
+    "fallbackDepartment": "Cloud Infra",
+    "tree": {
+      "Service Request": {
+        "Application Installation and Configuration -Service": [
+          "Tally Application Install to Client Machine",
+          "TallyPrime Server Installation",
+          "TallyPrime Server Data Path Configuration",
+          "Tally Version Upgrade",
+          "TDL Tally Definition Language Upload",
+          "Cheque Printing Configuration",
+          "Branchwise Tally Setup",
+          "Tally Data Security Control Setup",
+          "Dropbox File Share Configuration",
+          "TSplus SSL Configuration",
+          "Winflector Client Setup on New Machine",
+          "Remote App Configuration for New User",
+          "ODBC Connector Configuration for Tally",
+          "Tally Data Entry Doubts Clarification",
+          "Tally Shortcut Keys User Training",
+          "Tally Network Shared Folder Configuration"
+        ],
+        "Backup and Recovery -Service": [
+          "Tally Data Backup Manual",
+          "TallyPrime Server Automated Backup Schedule",
+          "Tally Backup Restore",
+          "Cloud Backup Setup for Tally Data",
+          "Tally Backup Encryption Setup",
+          "Tally Data Archive Setup"
+        ],
+        "Compliance and Taxation -Service": [
+          "EWay Bill API Registration in TallyPrime",
+          "EInvoice API Registration in TallyPrime",
+          "GST Filing Configuration in Tally",
+          "TDS Configuration in TallyPrime",
+          "GSTR1 GSTR3B Filing Assistance",
+          "EWay Bill Configuration for New Transporter",
+          "HSN SAC Code Master Setup",
+          "TDS Certificate Generation Form 16 16A",
+          "Payroll Compliance Setup PF ESI PT",
+          "ITC Input Tax Credit Reconciliation Setup"
+        ],
+        "Data Management -Service": [
+          "Tally Data Split by Financial Year",
+          "Tally Company Creation",
+          "Tally Data Migration from Old Version",
+          "Data Password Recovery",
+          "Tally Ledger Master Data Cleanup",
+          "Opening Balance Entry Assistance",
+          "Tally Data Consolidation MultiBranch",
+          "Stock Item Master Creation Update"
+        ],
+        "Infrastructure and Server Setup -Service": [
+          "TSC Tally Server Setup MultiUser",
+          "TSplus Server Installation Configuration",
+          "Remote Desktop RDP Access Setup",
+          "Cloud Server VM Provisioning for Tally",
+          "Network Drive Shared Path Configuration",
+          "Firewall Port Configuration for Tally",
+          "TSplus License Upgrade for Additional Users",
+          "Winflector License Assignment for New User",
+          "Antivirus Endpoint Security Setup on Tally Server"
+        ],
+        "Licensing and Subscription Management -Service": [
+          "Tally Subscription Renewal",
+          "Tally New License Purchase",
+          "Tally License Migration Device Transfer",
+          "TSplus Subscription Renewal",
+          "Winflector License Renewal",
+          "Tally Education Mode Removal License Activation",
+          "Cloud Hosting Subscription Management"
+        ],
+        "User Management and Access -Service": [
+          "Tally Cloud User Creation",
+          "Tally Data User Creation",
+          "Remote App User Onboarding",
+          "User Access Level Permission Configuration",
+          "Tally User Password Reset",
+          "Windows User Account Creation on Server",
+          "VPN Remote Access User Setup",
+          "User Offboarding Tally Remote Access"
+        ],
+        "Integration and Sync -Service": [
+          "BizApp Mobile App Initial Configuration",
+          "TallytoExcel Export Template Setup",
+          "Tally Data Sync Configuration Branch Sync",
+          "GSP ASP Integration Setup",
+          "Payment Gateway Integration with Tally",
+          "Banking Integration Bank Statement Import"
+        ],
+        "Reporting and MIS -Service": [
+          "Custom TallyPrime Report Configuration",
+          "MIS Report Setup for Management",
+          "Ageing Report Configuration",
+          "Cost Centre Profit Centre Report Setup",
+          "Inventory Report Configuration",
+          "Tally Audit Trail Configuration"
+        ]
+      },
+      "Change Request": {
+        "Application Installation and Configuration -Change": [
+          "TDL Upload",
+          "Tally Server Version Upgrade",
+          "TSplus Version Upgrade",
+          "Renaming Remote App TSplus Username",
+          "Web Server Configuration Update for Tally Web",
+          "Cheque Printing Layout Modification",
+          "Tally Printer Configuration Change",
+          "Virtual Host Domain Configuration Change",
+          "ODBC Configuration Update",
+          "Dropbox Folder Structure Reorganisation"
+        ],
+        "Backup and Recovery -Change": [
+          "Tally Backup Schedule Change",
+          "Backup Destination Change",
+          "Cloud Backup Policy Update",
+          "Tally Data Restore from Archive",
+          "AMI VM Snapshot Update for Tally Server"
+        ],
+        "Compliance and Taxation -Change": [
+          "GST Rate Change Update in Tally",
+          "HSN SAC Code Revision",
+          "EWay Bill API Credential Rotation",
+          "EInvoice API Credential Update",
+          "TDS Rate Revision Update",
+          "Payroll Statutory Rate Change PF ESI",
+          "GSTR1 GSTR3B Amendment Filing"
+        ],
+        "Data Management -Change": [
+          "Tally Company Name Financial Year Change",
+          "Tally Ledger Group Restructuring",
+          "Tally User Permission Modification",
+          "Stock Category Group Reorganisation",
+          "Cost Centre Modification",
+          "Tally Number Series Change",
+          "Data Migration Tally to New Server"
+        ],
+        "Infrastructure and Server Setup -Change": [
+          "Cloud VM Resize Scale Up Down for Tally Server",
+          "Windows OS Patch Update on Tally Server",
+          "Firewall Rule Modification for Tally",
+          "TSplus Configuration Parameter Change",
+          "Server Timezone Regional Settings Change",
+          "Static IP DNS Record Update for Tally Server",
+          "SSL Certificate Renewal for TSplus Web Portal",
+          "Disk Space Expansion on Tally Server"
+        ],
+        "Licensing and Subscription Management -Change": [
+          "Tally License Renewal AMC",
+          "Tally License Upgrade Silver to Gold",
+          "TSplus License User Count Change",
+          "Winflector License Count Modification",
+          "Cloud Server Reserved Instance Apply for Tally Hosting"
+        ],
+        "User Management and Access -Change": [
+          "IAM User Creation for Tally Server Cloud",
+          "TSplus User Password Reset",
+          "Tally User Role Modification",
+          "User Offboarding Full Access Revocation"
+        ],
+        "Integration and Sync -Change": [
+          "BizApp Sync Configuration Update",
+          "Tally Data Sync Rules Update",
+          "GSP EWay API URL Configuration Change",
+          "Payment Gateway Configuration Update"
+        ],
+        "Reporting and MIS -Change": [
+          "Custom Report TDL Script Modification",
+          "MIS Report Template Update",
+          "Audit Trail Configuration Change",
+          "Cost Centre Profit Centre Structure Update"
+        ]
+      },
+      "Incident Request": {
+        "Application Errors and Crashes - Incident": [
+          "Tally Data Internal Error Rectification",
+          "Data Rewrite Error",
+          "Tally TVU Tally Version Update Error",
+          "Tally Education Mode Issue",
+          "Tally Application Crash on Startup",
+          "Tally Data File Corruption Alert",
+          "Tally Script TDL Execution Error",
+          "Tally License Expired Locked Out",
+          "TallyPrime Out of Memory Freeze"
+        ],
+        "Compliance and Taxation Errors -Incident": [
+          "Tally GST Calculation Error",
+          "EWay Bill Generation Failure",
+          "EInvoice Generation IRN Error",
+          "GSTR1 Filing Error Rectification",
+          "GSTR2B Reconciliation Mismatch",
+          "TDS Mismatch Challan Return Error",
+          "EWay Bill Cancelled Invalid IRN Alert",
+          "GST Portal Data Mismatch Alert",
+          "Payroll Statutory Calculation Error"
+        ],
+        "Data Issues -Incident": [
+          "Tally Data Hanging Freezing Issue",
+          "Tally Import Failure",
+          "Tally Export Issue",
+          "Duplicate Entry Voucher Alert",
+          "Negative Stock Alert",
+          "Opening Balance Mismatch After Year Split",
+          "Tally Data Access Slowness MultiUser",
+          "Tally Print Issue",
+          "Dropbox File Recovery"
+        ],
+        "Infrastructure and Connectivity -Incident": [
+          "Tally Accessibility Issue Cannot Connect",
+          "Cloud Server Slowness Issue",
+          "Tally Gateway Server Error",
+          "ODBC Port Configuration Issue",
+          "Remote Access TSplus RDP Session Failure",
+          "TSplus Server Down Unresponsive",
+          "Tally Server Not Starting TSRV Service Failure",
+          "High CPU Memory Usage on Tally Server",
+          "VPN Connectivity Failure for Remote Tally",
+          "Network Drive Disconnected Inaccessible",
+          "Internet ISP Connectivity Failure Affecting Cloud Tally",
+          "Disk Space Full on Tally Server"
+        ],
+        "Integration and Sync Errors -Incident": [
+          "BizApp Sync Issue",
+          "Tally Data Sync Failure Branch",
+          "GSTR API Connection Failure",
+          "Bank Reconciliation AutoSync Error",
+          "Payment Gateway Reconciliation Mismatch"
+        ],
+        "Licensing and Subscription Management -Incident": [
+          "Tally License Expired Subscription Lapsed",
+          "TSplus License Limit Reached",
+          "Tally License Key Lost Corrupted",
+          "Cloud Server Billing Suspension Alert"
+        ]
+      }
+    }
+  }
+}

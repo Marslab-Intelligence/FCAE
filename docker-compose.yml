@@ -1,0 +1,25 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: mercury-landing-postgres
+    restart: unless-stopped
+    environment:
+      # Driven by .env (values fall back to safe local-dev defaults)
+      POSTGRES_USER: ${POSTGRES_USER:-mercury}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-mercury}
+      POSTGRES_DB: ${POSTGRES_DB:-mercury_landing}
+    ports:
+      - '5434:5432'
+    volumes:
+      # Named volume so data survives `docker compose down` and container recreates.
+      # Pre-existing volume "mercury-landing-pgdata" is reused on this machine.
+      - mercury-landing-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-mercury} -d ${POSTGRES_DB:-mercury_landing}']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  mercury-landing-pgdata:
+    name: mercury-landing-pgdata
