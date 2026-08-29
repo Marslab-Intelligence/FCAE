@@ -6,12 +6,13 @@ import { CheckCircle2, ArrowRight, Sparkles } from 'lucide-react';
 
 export default function CheckoutSuccessPage() {
   return (
-    <div className="min-h-screen pt-32 pb-24 px-6 max-w-3xl mx-auto text-center">
+    <div className="min-h-screen pt-32 pb-24 px-6 max-w-3xl mx-auto text-center flex flex-col justify-center">
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5 }}
         className="p-10 rounded-3xl border border-emerald-500/20 bg-linear-to-b from-emerald-500/10 via-white/3 to-transparent backdrop-blur-xl space-y-6"
+        data-audit="content-block"
       >
         <div className="w-20 h-20 rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center mx-auto text-emerald-400 shadow-[0_0_30px_rgba(16,185,129,0.3)]">
           <CheckCircle2 className="w-10 h-10" />

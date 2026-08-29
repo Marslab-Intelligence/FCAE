@@ -55,7 +55,8 @@ export default function CheckoutPage() {
   };
 
   return (
-    <div className="min-h-screen pt-32 pb-24 px-6 max-w-5xl mx-auto">
+    <div className="min-h-screen pt-32 pb-24 px-6 flex flex-col items-center justify-center">
+    <div className="w-full max-w-5xl mx-auto" data-audit="content-block">
       {/* Header */}
       <div className="mb-10 text-center">
         <div className="flex items-center justify-center gap-2 text-xs text-text-dim mb-4">
@@ -264,6 +265,7 @@ export default function CheckoutPage() {
           </div>
         </div>
       </div>
+    </div>
     </div>
   );
 }

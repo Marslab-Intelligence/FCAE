@@ -78,7 +78,8 @@ export default function CartPage() {
   const totalDueToday = subtotalMonthly + monthlyGst + subtotalOneTime + oneTimeGst;
 
   return (
-    <div className="min-h-screen pt-32 pb-24 px-6 max-w-7xl mx-auto">
+    <div className="min-h-screen pt-32 pb-24 px-6 flex flex-col items-center justify-center">
+    <div className="w-full max-w-7xl mx-auto" data-audit="content-block">
       {/* Breadcrumb & Header */}
       <div className="mb-10">
         <div className="flex items-center gap-2 text-xs text-text-dim mb-4">
@@ -255,6 +256,7 @@ export default function CartPage() {
           </div>
         </div>
       )}
+    </div>
     </div>
   );
 }

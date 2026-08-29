@@ -708,7 +708,7 @@ export function PackageBuilder({
 
   return (
     <section className={cn(
-      "relative flex-1 min-h-0 pt-24 lg:pt-28 pb-6 overflow-hidden bg-transparent flex flex-col justify-start",
+      "relative min-h-screen-nav pt-24 lg:pt-28 pb-6 overflow-hidden bg-transparent flex flex-col justify-start",
       isMaximized ? "z-60" : "z-10"
     )}>
       {/* Background ambient glows */}
@@ -717,7 +717,7 @@ export function PackageBuilder({
         <div className="absolute top-[20%] right-[10%] w-96 h-96 rounded-full bg-blue-600/5 blur-[120px]" />
       </div>
 
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 flex flex-col flex-1 min-h-0">
+      <div className="relative z-10 w-full max-w-7xl 2xl:max-w-[1900px] mx-auto px-4 sm:px-6 flex flex-col flex-1 min-h-0" data-audit="content-block">
         {/* Compact Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 shrink-0">
           <div>
