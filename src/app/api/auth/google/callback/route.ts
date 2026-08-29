@@ -1,3 +1,4 @@
+import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 import { eq } from 'drizzle-orm';
 import { db } from '@/db/client';
@@ -24,8 +25,18 @@ function getRequestOrigin(request: NextRequest): string {
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const code = searchParams.get('code');
+  const state = searchParams.get('state');
   const oauthError = searchParams.get('error');
   const origin = getRequestOrigin(request);
+
+  const cookieStore = await cookies();
+  const storedState = cookieStore.get(STATE_COOKIE)?.value;
+
+  if (!state || !storedState || state !== storedState) {
+    const response = NextResponse.redirect(new URL('/sign-in?error=invalid_state', origin));
+    response.cookies.delete(STATE_COOKIE);
+    return response;
+  }
 
   if (oauthError || !code) {
     console.error('Google OAuth error from query parameters:', oauthError);
