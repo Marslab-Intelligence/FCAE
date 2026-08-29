@@ -1,73 +1,127 @@
-import { timingSafeEqual } from 'node:crypto';
+/**
+ * POST /api/crm/deal-won
+ *
+ * Isolation model: this route has no browser session and is never called
+ * from the client — the caller is maiom-sales-engine's own server, hitting
+ * FCAE directly the moment a Deal is marked WON (the point at which the CRM
+ * promotes the linked Customer record to ACTIVE). There is no user to
+ * authorize against; instead every request must carry a valid HMAC-SHA256
+ * signature over the raw body (see verifySignature below), proving it
+ * actually came from the CRM and the body wasn't tampered with in transit.
+ * `data.clientEmail` in the payload is what ties the request back to an
+ * FCAE user — it is looked up directly, there is no session to trust.
+ *
+ * Payload shape (per the maiom-sales-engine side, confirm if it drifts):
+ *   {
+ *     event: "DEAL_WON",
+ *     title: string,
+ *     message: string,
+ *     data: {
+ *       clientEmail: string,
+ *       dealName: string,
+ *       companyName: string,
+ *       totalDealValue: string | number,
+ *       ...other fields are ignored
+ *     }
+ *   }
+ */
+import { createHmac, timingSafeEqual } from 'node:crypto';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { eq } from 'drizzle-orm';
 import { db } from '@/db/client';
 import { users } from '@/db/schema';
 
-/**
- * STUB — not wired to a real trigger yet.
- *
- * Per AGENTS.md's lifecycle notes: FCAE never pushes an "onboarded" event to
- * maiom-sales-engine. Instead, the Deal -> Client transition happens on the
- * CRM side when sales marks a deal won, and (once the CRM's contract is
- * final) maiom-sales-engine is expected to call *this* endpoint to tell FCAE
- * "this email is now a won client."
- *
- * Nothing in maiom-sales-engine points at this route yet — the payload shape
- * below (just `email`) is a placeholder guess, not a confirmed contract. Treat
- * this as scaffolding: the auth pattern and the isActiveClient flip are real
- * and safe to keep, but do not consider this "live" until the CRM-side shape
- * is confirmed and CRM_WEBHOOK_SECRET is actually set somewhere real.
- *
- * Auth: a shared-secret header, the same pattern as the outbound
- * CRM_API_KEY (src/lib/crm.ts) but a separate secret/env var, since inbound
- * and outbound credentials shouldn't be the same value.
- */
+const SIGNATURE_HEADER = 'x-webhook-signature';
 
-const WEBHOOK_HEADER = 'x-crm-webhook-secret';
-
-const payloadSchema = z.object({
-  email: z.string().trim().toLowerCase().email(),
-  // TODO(deal-api): confirm what else maiom-sales-engine actually sends
-  // (deal id? won amount? plan/tier?) once the real contract exists — an
-  // `orders` row could be inserted here instead of/alongside flipping
-  // isActiveClient if amount/plan data is available.
+const dealWonPayloadSchema = z.object({
+  event: z.literal('DEAL_WON'),
+  title: z.string().optional(),
+  message: z.string().optional(),
+  data: z.object({
+    clientEmail: z.string().trim().toLowerCase().email(),
+    dealName: z.string().optional(),
+    companyName: z.string().optional(),
+    totalDealValue: z.union([z.string(), z.number()]).optional(),
+  }),
 });
 
-function isAuthorized(request: NextRequest): boolean {
-  const secret = process.env.CRM_WEBHOOK_SECRET;
-  if (!secret) return false; // not configured — treat as disabled, not "trust everyone"
+/**
+ * Signature = hex-encoded HMAC-SHA256 of the exact raw request body, keyed by
+ * WEBHOOK_SIGNING_SECRET (shared with the CRM out of band, must match
+ * exactly). Plain hex digest, no "sha256=" prefix — confirm this matches
+ * what maiom-sales-engine actually sends before wiring the real secret in.
+ */
+function verifySignature(rawBody: string, providedSignature: string | null): boolean {
+  const secret = process.env.WEBHOOK_SIGNING_SECRET;
+  if (!secret || !providedSignature) return false;
 
-  const provided = request.headers.get(WEBHOOK_HEADER);
-  if (!provided) return false;
+  const expected = createHmac('sha256', secret).update(rawBody, 'utf8').digest('hex');
 
-  const secretBuf = Buffer.from(secret);
-  const providedBuf = Buffer.from(provided);
-  return secretBuf.length === providedBuf.length && timingSafeEqual(secretBuf, providedBuf);
+  const expectedBuf = Buffer.from(expected, 'hex');
+  const providedBuf = Buffer.from(providedSignature, 'hex');
+  if (expectedBuf.length !== providedBuf.length) return false;
+
+  return timingSafeEqual(expectedBuf, providedBuf);
 }
 
 export async function POST(request: NextRequest) {
-  if (!isAuthorized(request)) {
-    // Same response whether the secret is unset (route disabled) or wrong
-    // (bad caller) — don't leak which case it is.
+  // Read the raw body first — signing covers the exact bytes sent, so this
+  // must happen before any parsing, and the payload must not be touched
+  // until the signature is verified.
+  const rawBody = await request.text();
+  const signature = request.headers.get(SIGNATURE_HEADER);
+
+  if (!verifySignature(rawBody, signature)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const body = await request.json().catch(() => null);
-  const parsed = payloadSchema.safeParse(body);
+  let body: unknown;
+  try {
+    body = JSON.parse(rawBody);
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
+  }
+
+  const parsed = dealWonPayloadSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json({ error: 'Invalid payload', details: parsed.error.issues }, { status: 400 });
   }
 
-  const [user] = await db.select({ id: users.id }).from(users).where(eq(users.email, parsed.data.email)).limit(1);
+  const { clientEmail, dealName, companyName, totalDealValue } = parsed.data.data;
+
+  const [user] = await db.select({ id: users.id }).from(users).where(eq(users.email, clientEmail)).limit(1);
+
   if (!user) {
-    // No FCAE account for this email yet — nothing to flip. Not an error:
-    // the deal may have been won for someone who hasn't signed up here.
+    // A deal was won for someone who never created an FCAE account (e.g. the
+    // sales team closed a deal sourced entirely outside the website). Not an
+    // error on the CRM's end — 200 so it isn't retried as a failed delivery.
+    //
+    // Judgment call: log this clearly rather than adding a reconciliation
+    // table. This is expected to be rare (most won deals should trace back
+    // to a website enquiry with a matching account), a table adds a
+    // migration + UI for something that may never need one, and a
+    // structured log line is enough to catch it in server logs / whatever
+    // log aggregation is in place. Revisit with a real table if this turns
+    // out to happen often enough that logs aren't sufficient.
+    console.warn('[CRM webhook] DEAL_WON for an email with no FCAE account — orphaned win:', {
+      clientEmail,
+      dealName,
+      companyName,
+      totalDealValue,
+    });
     return NextResponse.json({ ok: true, matched: false });
   }
 
   await db.update(users).set({ isActiveClient: true }).where(eq(users.id, user.id));
+
+  console.log('[CRM webhook] DEAL_WON matched an FCAE account, isActiveClient set:', {
+    userId: user.id,
+    clientEmail,
+    dealName,
+    companyName,
+    totalDealValue,
+  });
 
   return NextResponse.json({ ok: true, matched: true });
 }
