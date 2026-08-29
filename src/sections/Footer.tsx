@@ -110,7 +110,7 @@ export function Footer() {
 
         {/* Bottom Bar */}
         <div className="pt-8 border-t border-white/8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-white/45">
-          <p>© {new Date().getFullYear()} SID Managed Cloud Services Pvt. Ltd. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} SIDCORPTECH LLB. All rights reserved.</p>
           <div className="flex items-center gap-5">
             <Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link>
             <Link href="/terms" className="hover:text-white transition-colors">Terms</Link>
