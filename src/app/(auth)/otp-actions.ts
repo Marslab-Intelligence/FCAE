@@ -1,5 +1,6 @@
 'use server';
 
+import { randomInt } from 'node:crypto';
 import { eq, and, gt } from 'drizzle-orm';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
@@ -34,7 +35,7 @@ export async function sendOtpAction(
     await db.delete(otpTokens).where(eq(otpTokens.email, email));
 
     // Generate a secure 6-digit code
-    const code = String(Math.floor(100_000 + Math.random() * 900_000));
+    const code = String(randomInt(100_000, 1_000_000));
     const expiresAt = new Date(Date.now() + OTP_TTL_MS);
 
     await db.insert(otpTokens).values({ email, code, expiresAt });
