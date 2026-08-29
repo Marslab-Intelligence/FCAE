@@ -1,11 +1,23 @@
 import 'server-only';
 
 /**
- * Hand-off from the website's own `leads` table into the maiom-sales-engine CRM.
+ * Hand-off from the website's own `leads` table into the maiom-sales-engine CRM,
+ * where it becomes a Deal for the sales team to work (won → the person becomes
+ * a Client; see AGENTS.md's lifecycle notes). The local table is still called
+ * `leads` — that's the pre-CRM capture step (an enquiry that hasn't been
+ * pushed anywhere yet) — but everything CRM-facing here is framed as "Deal"
+ * to match what it actually becomes once it lands in maiom-sales-engine.
  *
  * The website is always the first writer: a quote request is stored locally and
- * only then pushed across. If the CRM is unreachable the lead is still captured
- * and the failure is recorded on the row, so nothing is lost to an outage.
+ * only then pushed across. If the CRM is unreachable the enquiry is still
+ * captured and the failure is recorded on the row, so nothing is lost to an
+ * outage.
+ *
+ * TODO(deal-api): CRM_INTAKE_PATH and the payload shape below (CrmDealPayload)
+ * are placeholders carried over from before this was framed as a Deal — the
+ * real maiom-sales-engine Deal endpoint path/payload isn't finalized yet.
+ * Update both once it is; CRM_API_URL/CRM_API_KEY/CRM_TIMEOUT_MS should stay
+ * as the configurable knobs either way.
  */
 
 const CRM_BASE_URL = process.env.CRM_API_URL ?? '';
@@ -51,7 +63,7 @@ export function toCrmIndustry(industry: string | null | undefined): string {
   return INDUSTRY_MAP[industry.trim().toLowerCase()] ?? 'OTHER';
 }
 
-export interface CrmLeadPayload {
+export interface CrmDealPayload {
   companyName: string;
   website: string | null;
   firstName: string;
@@ -62,25 +74,27 @@ export interface CrmLeadPayload {
   country: string | null;
   zipCode: string | null;
   industry: string;
-  leadSource: 'WEBSITE';
+  // TODO(deal-api): field name/value carried over from the old Lead payload
+  // shape — confirm what maiom-sales-engine's Deal intake actually expects.
+  dealSource: 'WEBSITE';
   customerRequirement: string | null;
   customerBudget: number | null;
   /** Free-text industry when it didn't map onto the enum. */
   industryLabel?: string | null;
-  /** Package context, so sales opens the lead knowing what was configured. */
+  /** Package context, so sales opens the deal knowing what was configured. */
   planId?: string | null;
   selectedServices?: string | null;
 }
 
 export type CrmPushResult =
-  | { ok: true; crmLeadId: string }
+  | { ok: true; crmDealId: string }
   | { ok: false; error: string };
 
 export function isCrmConfigured(): boolean {
   return Boolean(CRM_BASE_URL && CRM_API_KEY);
 }
 
-export async function pushLeadToCrm(payload: CrmLeadPayload): Promise<CrmPushResult> {
+export async function pushDealToCrm(payload: CrmDealPayload): Promise<CrmPushResult> {
   if (!isCrmConfigured()) {
     return { ok: false, error: 'CRM not configured (set CRM_API_URL and CRM_API_KEY)' };
   }
@@ -107,14 +121,16 @@ export async function pushLeadToCrm(payload: CrmLeadPayload): Promise<CrmPushRes
       return { ok: false, error: `CRM responded ${res.status}: ${text.slice(0, 300)}` };
     }
 
-    let crmLeadId = '';
+    let crmDealId = '';
     try {
       const json = JSON.parse(text);
-      crmLeadId = json?.data?.leadId ?? json?.data?.id ?? json?.leadId ?? json?.id ?? '';
+      // TODO(deal-api): key names guessed from the old Lead response shape —
+      // confirm against the real Deal endpoint response.
+      crmDealId = json?.data?.dealId ?? json?.data?.leadId ?? json?.data?.id ?? json?.dealId ?? json?.id ?? '';
     } catch {
       /* a 2xx without parseable JSON still counts as delivered */
     }
-    return { ok: true, crmLeadId };
+    return { ok: true, crmDealId };
   } catch (err) {
     const reason =
       err instanceof Error && err.name === 'AbortError'
