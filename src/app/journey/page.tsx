@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { JourneyStory } from '@/components/JourneyStory';
 
 export const metadata: Metadata = {
-  title: 'The FCAE Maturity Journey — MotionForge',
+  title: 'The FCAE Maturity Journey — SID Managed Cloud',
   description: 'From Foundation to Elite — a visual walkthrough of the FCAE maturity tiers and what each stage unlocks.',
 };
 

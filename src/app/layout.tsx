@@ -27,37 +27,38 @@ const fraunces = Fraunces({
   style: ['normal', 'italic'],
 });
 
+// TODO: metadataBase/openGraph.url below use a placeholder domain — swap in
+// the real SIDCORPTECH/FCAE production domain once it's decided.
 export const metadata: Metadata = {
-  title: 'MotionForge — The Complete Animation Stack for the Modern Web',
-  description: 'Build stunning web animations visually. No code required. Scroll animations, page transitions, stagger effects, SVG drawing, split text — all in one powerful visual editor.',
-  keywords: ['web animation', 'scroll animations', 'page transitions', 'visual editor', 'no-code animation', 'GSAP', 'Framer Motion', 'web design'],
-  authors: [{ name: 'MotionForge' }],
-  creator: 'MotionForge',
-  publisher: 'MotionForge',
+  title: 'SID Managed Cloud — Enterprise Cloud Expertise Without Enterprise Hiring',
+  description: 'Your on-demand Cloud Architecture & Engineering team for AWS, Microsoft Azure, and Hybrid Cloud — delivered through a predictable monthly subscription.',
+  keywords: ['managed cloud services', 'cloud operations', 'AWS', 'Microsoft Azure', 'hybrid cloud', 'FinOps', 'DevOps', 'cloud architecture'],
+  authors: [{ name: 'SIDCORPTECH' }],
+  creator: 'SIDCORPTECH',
+  publisher: 'SIDCORPTECH',
   robots: 'index, follow',
-  metadataBase: new URL('https://motionforge.dev'),
+  metadataBase: new URL('https://www.sidcorptech.com'),
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://motionforge.dev',
-    title: 'MotionForge — The Complete Animation Stack for the Modern Web',
-    description: 'Build stunning web animations visually. No code required.',
-    siteName: 'MotionForge',
+    url: 'https://www.sidcorptech.com',
+    title: 'SID Managed Cloud — Enterprise Cloud Expertise Without Enterprise Hiring',
+    description: 'Your on-demand Cloud Architecture & Engineering team for AWS, Microsoft Azure, and Hybrid Cloud.',
+    siteName: 'SID Managed Cloud',
     images: [
       {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'MotionForge - The Complete Animation Stack',
+        alt: 'SID Managed Cloud',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'MotionForge — The Complete Animation Stack',
-    description: 'Build stunning web animations visually. No code required.',
+    title: 'SID Managed Cloud — Enterprise Cloud Expertise Without Enterprise Hiring',
+    description: 'Your on-demand Cloud Architecture & Engineering team for AWS, Microsoft Azure, and Hybrid Cloud.',
     images: ['/og-image.png'],
-    creator: '@motionforge',
   },
   icons: {
     icon: '/icon.svg',

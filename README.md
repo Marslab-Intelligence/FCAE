@@ -1,6 +1,6 @@
-# Mercury Landing
+# FCAE
 
-Marketing site + account area built with **Next.js 16 (App Router)**, **Tailwind CSS 4**, **Drizzle ORM**, and **PostgreSQL 16** (via Docker).
+SIDCORPTECH marketing site + client portal built with **Next.js 16 (App Router)**, **Tailwind CSS 4**, **Drizzle ORM**, and **PostgreSQL 16** (via Docker).
 
 ---
 
