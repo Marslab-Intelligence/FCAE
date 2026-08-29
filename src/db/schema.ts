@@ -7,6 +7,16 @@ export const users = pgTable('users', {
   hashedPassword: text('hashed_password'),
   googleId: text('google_id').unique(),
   name: text('name'),
+  // A boolean column rather than a derived `exists(orders where status='paid')`
+  // query: the maiom-sales-engine "deal won" webhook (see
+  // src/app/api/crm/deal-won/route.ts) needs to be able to flip a user to a
+  // client directly, without necessarily having an order row to point at yet
+  // (e.g. an offline/manual payment the CRM records before FCAE checkout is
+  // used at all). A derived-from-orders query can't represent that case.
+  // When a real order *is* paid, its handler should set this too, so orders
+  // stay the source of truth for "what/when" and this column stays the
+  // source of truth for "is this account allowed into /account".
+  isActiveClient: boolean('is_active_client').notNull().default(false),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 });
 
@@ -29,6 +39,65 @@ export const savedPlans = pgTable('saved_plans', {
     .references(() => users.id, { onDelete: 'cascade' }),
   tier: planTierEnum('tier').notNull(),
   savedAt: timestamp('saved_at').notNull().defaultNow(),
+});
+
+export const orderStatusEnum = pgEnum('order_status', ['pending', 'paid', 'failed', 'refunded']);
+
+/**
+ * A checkout attempt for a plan (+ optional add-ons). `razorpayOrderId` /
+ * `razorpayPaymentId` stay nullable until the Razorpay integration lands —
+ * rows are created in `pending` status today from the checkout flow's
+ * request-submission step, since real charging is deferred.
+ */
+export const orders = pgTable('orders', {
+  id: text('id').primaryKey().$defaultFn(() => randomUUID()),
+  userId: text('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  // Text, not `planTierEnum`: an order can bundle add-ons alongside a tier
+  // (e.g. the checkout page's "Assure plan + SOC 2 Audit + FinOps Dashboard"),
+  // so this holds whatever plan/package identifier the checkout flow used,
+  // matching the same convention as `leads.planId`.
+  planId: text('plan_id').notNull(),
+  // Whole currency units (rupees), matching package-catalog.ts's `priceMonthly`
+  // convention — not paise/cents.
+  amount: integer('amount').notNull(),
+  currency: text('currency').notNull().default('INR'),
+  status: orderStatusEnum('status').notNull().default('pending'),
+  razorpayOrderId: text('razorpay_order_id'),
+  razorpayPaymentId: text('razorpay_payment_id'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  paidAt: timestamp('paid_at'),
+});
+
+export const invoiceStatusEnum = pgEnum('invoice_status', ['draft', 'issued', 'paid', 'void']);
+
+/**
+ * Kept separate from `orders` rather than folded in: an order is "one
+ * checkout attempt," but billing (especially once subscriptions renew
+ * monthly) needs a 1-to-many history per order — each billing cycle gets its
+ * own invoice row/number even though they trace back to the same order. A
+ * folded design would force a new `orders` row per billing cycle instead,
+ * which conflates "a customer tried to buy something" with "a bill was
+ * issued," and would make `razorpayOrderId` ambiguous across cycles.
+ */
+export const invoices = pgTable('invoices', {
+  id: text('id').primaryKey().$defaultFn(() => randomUUID()),
+  orderId: text('order_id')
+    .notNull()
+    .references(() => orders.id, { onDelete: 'cascade' }),
+  userId: text('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  invoiceNumber: text('invoice_number').notNull().unique(),
+  amountDue: integer('amount_due').notNull(),
+  amountPaid: integer('amount_paid').notNull().default(0),
+  status: invoiceStatusEnum('status').notNull().default('draft'),
+  issuedAt: timestamp('issued_at'),
+  dueAt: timestamp('due_at'),
+  // Populated once PDF invoice generation exists; null until then.
+  pdfUrl: text('pdf_url'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
 });
 
 /**
