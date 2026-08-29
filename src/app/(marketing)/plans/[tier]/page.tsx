@@ -415,14 +415,6 @@ export default async function PlanDetailPage({ params }: { params: Promise<{ tie
   }
 
   const plan = PLAN_DETAILS[planKey];
-  const allTiers: PlanKey[] = ['foundation', 'care', 'assure', 'elite'];
 
-  return (
-    <PlanDetailClient
-      plan={plan}
-      planKey={planKey}
-      allTiers={allTiers}
-      allPlanDetails={PLAN_DETAILS}
-    />
-  );
+  return <PlanDetailClient plan={plan} />;
 }

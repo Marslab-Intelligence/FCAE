@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import Link from 'next/link';
 import type { LucideIcon } from 'lucide-react';
 import { 
@@ -14,7 +14,6 @@ import {
   motion,
   useInView,
   useMotionValue,
-  useMotionValueEvent,
   useReducedMotion,
   useScroll,
   useSpring,
@@ -23,7 +22,6 @@ import {
 } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useCurrency } from '@/components/CurrencyProvider';
-import GlassSurface from '@/components/GlassSurface';
 
 const ICON_MAP: Record<string, LucideIcon> = {
   'shield-check': ShieldCheck,
@@ -133,16 +131,10 @@ const itemVariants: Variants = {
 
 interface PlanDetailClientProps {
   plan: PlanDetail;
-  planKey: PlanKey;
-  allTiers: PlanKey[];
-  allPlanDetails: Record<PlanKey, PlanDetail>;
 }
 
 export default function PlanDetailClient({
   plan,
-  planKey,
-  allTiers,
-  allPlanDetails,
 }: PlanDetailClientProps) {
   const { compact } = useCurrency();
   const sectionRef = useRef<HTMLElement>(null);
@@ -161,21 +153,6 @@ export default function PlanDetailClient({
   const topOrbY = useTransform(scrollYProgress, [0, 1], [30, -45]);
   const bottomOrbY = useTransform(scrollYProgress, [0, 1], [-25, 45]);
 
-  // Floating tier-switcher bar: hide on scroll-down, reveal on scroll-up —
-  // it's `fixed`, so without this it just sits on top of content forever.
-  const { scrollY } = useScroll();
-  const lastScrollY = useRef(0);
-  const [switcherHidden, setSwitcherHidden] = useState(false);
-
-  useMotionValueEvent(scrollY, 'change', (latest) => {
-    const diff = latest - lastScrollY.current;
-    // Ignore tiny jitter (mobile momentum scroll, trackpad noise) and stay
-    // visible near the very top regardless of direction.
-    if (Math.abs(diff) > 4) {
-      setSwitcherHidden(diff > 0 && latest > 120);
-    }
-    lastScrollY.current = latest;
-  });
 
   // Left & Right Service items mapped dynamically per plan or falling back to default Cloud Operations
   const leftCloudServices = plan.architectureServicesLeft || [
@@ -224,82 +201,6 @@ export default function PlanDetailClient({
   return (
     <div className={cn('min-h-screen text-white overflow-x-hidden transition-colors duration-700', plan.bgPage)}>
       
-      {/* ── Persistent Tier-Accented Floating Glass Package Switcher Bar ── */}
-      <motion.div
-        className="fixed top-24 z-50 w-full px-4 pointer-events-none"
-        animate={{ y: switcherHidden ? -140 : 0, opacity: switcherHidden ? 0 : 1 }}
-        transition={{ duration: 0.35, ease: 'easeInOut' }}
-      >
-        <GlassSurface
-          width="100%"
-          height="auto"
-          borderRadius={9999}
-          backgroundOpacity={0.15}
-          blur={14}
-          displace={10}
-          distortionScale={-140}
-          redOffset={4}
-          greenOffset={12}
-          blueOffset={22}
-          saturation={2.0}
-          className={cn(
-            'mx-auto max-w-4xl rounded-full p-2 flex items-center justify-between pointer-events-auto border transition-all duration-500 shadow-2xl',
-            plan.borderColor,
-            plan.glowColor
-          )}
-        >
-          {/* Inner Tier Switcher Track */}
-          <div className="flex items-center gap-1.5 p-1 bg-white/10 backdrop-blur-xl rounded-full border border-white/15 overflow-x-auto no-scrollbar">
-            {allTiers.map((tKey) => {
-              const t = allPlanDetails[tKey];
-              const isActive = tKey === planKey;
-              return (
-                <Link
-                  key={tKey}
-                  href={`/plans/${tKey}`}
-                  className={cn(
-                    'relative flex items-center gap-2 px-4 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all duration-300 shrink-0 capitalize',
-                    isActive
-                      ? 'bg-white text-slate-950 shadow-[0_0_25px_rgba(255,255,255,0.7)] font-extrabold scale-[1.02]'
-                      : 'text-white/80 hover:text-white hover:bg-white/15'
-                  )}
-                >
-                  <span className={cn(
-                    'w-2.5 h-2.5 rounded-full transition-all duration-300',
-                    isActive ? 'bg-slate-950 scale-110' : t.accentText.replace('text-', 'bg-')
-                  )} />
-                  <span>{t.name}</span>
-                  {tKey === 'assure' && (
-                    <span className={cn(
-                      'ml-1 text-[9px] uppercase px-2 py-0.5 rounded-full font-bold tracking-wider',
-                      isActive
-                        ? 'bg-slate-200/50 text-amber-800 border border-amber-600/30'
-                        : 'bg-amber-400/20 text-amber-300 border border-amber-400/40'
-                    )}>
-                      Popular
-                    </span>
-                  )}
-                </Link>
-              );
-            })}
-          </div>
-
-          {/* Divider & Action Button */}
-          <div className="flex items-center shrink-0">
-            <div className="h-6 w-px bg-white/20 mx-2 hidden sm:block" />
-            <Link
-              href={`/build?plan=${plan.id}`}
-              className={cn(
-                'hidden sm:inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white text-slate-950 font-extrabold text-xs sm:text-sm transition-all duration-300 hover:bg-white/90 shrink-0 active:scale-95 shadow-2xl',
-                plan.glowColor
-              )}
-            >
-              Customize {plan.name} <ArrowRight className="w-4 h-4" />
-            </Link>
-          </div>
-        </GlassSurface>
-      </motion.div>
-
       {/* ── Full-Screen Edge-to-Edge Kinetic Hero Section (UNTOUCHED BACKGROUND IMAGES/VIDEOS) ── */}
       <section className="relative w-full min-h-[92vh] lg:min-h-screen flex flex-col justify-between pt-48 md:pt-52 lg:pt-56 pb-16 px-4 sm:px-6 lg:px-12 overflow-hidden border-b border-white/10">
         
