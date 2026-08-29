@@ -3,12 +3,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { eq } from 'drizzle-orm';
 import { db } from '@/db/client';
 import { users } from '@/db/schema';
-import { createSession } from '@/lib/auth';
+import { buildSessionCookie, createSession } from '@/lib/auth';
 import { adoptPendingPlan } from '@/lib/pending-plan';
 
 const STATE_COOKIE = 'google_oauth_state';
-const SESSION_COOKIE = 'mercury_session';
-const SESSION_DURATION_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
 
 interface GoogleProfile {
   sub: string;
@@ -106,13 +104,8 @@ export async function GET(request: NextRequest) {
     response.cookies.delete(STATE_COOKIE);
 
     // Set the session cookie directly on the NextResponse object so it is sent in the headers
-    response.cookies.set(SESSION_COOKIE, sessionId, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      path: '/',
-      expires: new Date(Date.now() + SESSION_DURATION_MS),
-    });
+    const { name, value, options } = buildSessionCookie(sessionId);
+    response.cookies.set(name, value, options);
 
     return response;
   } catch (err) {

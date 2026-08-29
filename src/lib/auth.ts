@@ -1,13 +1,63 @@
 import 'server-only';
-import { randomUUID } from 'node:crypto';
+import { createHmac, randomUUID, timingSafeEqual } from 'node:crypto';
 import { cookies } from 'next/headers';
 import bcrypt from 'bcryptjs';
 import { eq } from 'drizzle-orm';
 import { db } from '@/db/client';
 import { sessions, users } from '@/db/schema';
 
-const SESSION_COOKIE = 'mercury_session';
+export const SESSION_COOKIE = 'mercury_session';
 const SESSION_DURATION_MS = 30 * 24 * 60 * 60 * 1000; // 30 days
+
+// The cookie stores `${sessionId}.${hmacSignature}` rather than a bare
+// session id. The id is already an unguessable random UUID validated
+// against the DB on every request, so this isn't guarding against ID
+// guessing — it's so a tampered/forged cookie value is rejected before it
+// ever reaches the DB lookup, and a raw DB session id leaked via another
+// channel (e.g. a log line) can't be replayed as a cookie without also
+// knowing SESSION_SECRET.
+function getSessionSecret(): string {
+  const secret = process.env.SESSION_SECRET;
+  if (!secret) {
+    throw new Error(
+      'SESSION_SECRET is not set. Generate one with `openssl rand -base64 32` and set it in your environment.',
+    );
+  }
+  return secret;
+}
+
+function signSessionId(sessionId: string): string {
+  const signature = createHmac('sha256', getSessionSecret()).update(sessionId).digest('hex');
+  return `${sessionId}.${signature}`;
+}
+
+/** Verifies a raw cookie value and returns the session id, or null if missing/invalid/tampered. */
+function verifySessionCookieValue(value: string | undefined): string | null {
+  if (!value) return null;
+  const separatorIndex = value.lastIndexOf('.');
+  if (separatorIndex === -1) return null;
+
+  const sessionId = value.slice(0, separatorIndex);
+  const signature = value.slice(separatorIndex + 1);
+  const expectedSignature = createHmac('sha256', getSessionSecret()).update(sessionId).digest('hex');
+
+  const signatureBuf = Buffer.from(signature, 'hex');
+  const expectedBuf = Buffer.from(expectedSignature, 'hex');
+  if (signatureBuf.length !== expectedBuf.length || !timingSafeEqual(signatureBuf, expectedBuf)) {
+    return null;
+  }
+  return sessionId;
+}
+
+function sessionCookieOptions() {
+  return {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax' as const,
+    path: '/',
+    expires: new Date(Date.now() + SESSION_DURATION_MS),
+  };
+}
 
 export function hashPassword(password: string) {
   return bcrypt.hash(password, 10);
@@ -29,20 +79,20 @@ export async function createSession(userId: string) {
   return session.id;
 }
 
+/** Builds the signed cookie value + options for a session id, for callers that need to set it on a NextResponse directly (e.g. an OAuth callback redirect) instead of via `cookies()`. */
+export function buildSessionCookie(sessionId: string) {
+  return { name: SESSION_COOKIE, value: signSessionId(sessionId), options: sessionCookieOptions() };
+}
+
 export async function setSessionCookie(sessionId: string) {
   const cookieStore = await cookies();
-  cookieStore.set(SESSION_COOKIE, sessionId, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    path: '/',
-    expires: new Date(Date.now() + SESSION_DURATION_MS),
-  });
+  const { name, value, options } = buildSessionCookie(sessionId);
+  cookieStore.set(name, value, options);
 }
 
 export async function clearSessionCookie() {
   const cookieStore = await cookies();
-  const sessionId = cookieStore.get(SESSION_COOKIE)?.value;
+  const sessionId = verifySessionCookieValue(cookieStore.get(SESSION_COOKIE)?.value);
   if (sessionId) {
     try {
       await db.delete(sessions).where(eq(sessions.id, sessionId));
@@ -73,7 +123,7 @@ let dbFailureLoggedAt = 0;
 
 export async function getCurrentUser(): Promise<CurrentUser | null> {
   const cookieStore = await cookies();
-  const sessionId = cookieStore.get(SESSION_COOKIE)?.value;
+  const sessionId = verifySessionCookieValue(cookieStore.get(SESSION_COOKIE)?.value);
   if (!sessionId) return null;
 
   // DB is in the cooldown window — serve as logged-out without querying.
