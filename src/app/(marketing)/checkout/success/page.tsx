@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { CheckCircle2, ArrowRight, Download, Sparkles } from 'lucide-react';
+import { CheckCircle2, ArrowRight, Sparkles } from 'lucide-react';
 
 export default function CheckoutSuccessPage() {
   return (
@@ -19,18 +19,19 @@ export default function CheckoutSuccessPage() {
 
         <div className="space-y-2">
           <span className="text-xs font-semibold uppercase tracking-widest text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 rounded-full">
-            Order #SID-2026-8942 Activated
+            Request Received
           </span>
-          <h1 className="font-display font-bold text-3xl md:text-4xl text-text">Welcome to SID Managed Cloud!</h1>
+          <h1 className="font-display font-bold text-3xl md:text-4xl text-text">Thanks for reaching out to SID Managed Cloud!</h1>
           <p className="text-text-muted text-sm max-w-lg mx-auto">
-            Your payment of <strong className="text-text font-mono">₹1,35,700</strong> has been processed successfully. Your dedicated cloud engineers have been notified.
+            Online payment isn&apos;t live yet, so nothing has been charged. Your request has been recorded and a
+            member of our team will contact you shortly to finalize billing and onboarding.
           </p>
         </div>
 
-        {/* Kickoff Steps Timeline */}
+        {/* What happens next */}
         <div className="p-6 rounded-2xl bg-white/5 border border-white/8 text-left space-y-4">
           <h2 className="font-display font-bold text-base text-text flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-accent" /> Immediate Onboarding Next Steps:
+            <Sparkles className="w-4 h-4 text-accent" /> What Happens Next:
           </h2>
 
           <div className="space-y-3 text-xs">
@@ -39,8 +40,8 @@ export default function CheckoutSuccessPage() {
                 1
               </div>
               <div>
-                <p className="font-bold text-text">Access Your Dashboard</p>
-                <p className="text-text-muted">Invite your infrastructure team and share IAM cross-account access role securely.</p>
+                <p className="font-bold text-text">Our sales team reviews your request</p>
+                <p className="text-text-muted">A Solutions Architect will reach out to confirm scope and answer any questions.</p>
               </div>
             </div>
 
@@ -49,8 +50,8 @@ export default function CheckoutSuccessPage() {
                 2
               </div>
               <div>
-                <p className="font-bold text-text">Kickoff Architecture Call</p>
-                <p className="text-text-muted">Scheduled automatically within 2 hours. Your Solutions Architect will review your workload.</p>
+                <p className="font-bold text-text">Billing is finalized together</p>
+                <p className="text-text-muted">We&apos;ll confirm pricing and payment with you directly until online checkout is available.</p>
               </div>
             </div>
 
@@ -59,8 +60,8 @@ export default function CheckoutSuccessPage() {
                 3
               </div>
               <div>
-                <p className="font-bold text-text">Initial FinOps Audit</p>
-                <p className="text-text-muted">First automated cost optimization report generated within 24 hours.</p>
+                <p className="font-bold text-text">Onboarding begins</p>
+                <p className="text-text-muted">Once confirmed, your dedicated cloud engineers kick off the engagement.</p>
               </div>
             </div>
           </div>
@@ -68,17 +69,11 @@ export default function CheckoutSuccessPage() {
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
           <Link
-            href="/account"
+            href="/"
             className="px-8 py-4 rounded-xl bg-linear-to-r from-accent to-purple-600 text-white font-bold hover:from-accent-glow hover:to-purple-500 shadow-[0_0_30px_-5px_rgba(168,85,247,0.6)] transition-all flex items-center justify-center gap-2 text-sm"
           >
-            Go to Client Dashboard <ArrowRight className="w-4 h-4" />
+            Back to Home <ArrowRight className="w-4 h-4" />
           </Link>
-          <button
-            onClick={() => alert('Tax Invoice #SID-2026-8942 downloaded.')}
-            className="px-6 py-4 rounded-xl bg-white/5 border border-white/10 text-text font-semibold hover:bg-white/10 transition-all text-sm flex items-center justify-center gap-2"
-          >
-            <Download className="w-4 h-4 text-text-dim" /> Download Tax Invoice
-          </button>
         </div>
       </motion.div>
     </div>

@@ -4,9 +4,10 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { ShieldCheck, CreditCard, Building2, Lock, ArrowRight, ChevronRight } from 'lucide-react';
+import { ShieldCheck, Building2, CreditCard, Lock, ArrowRight, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCurrency } from '@/components/CurrencyProvider';
+import { PaymentMethodSelector, type PaymentMethod } from '@/components/PaymentMethodSelector';
 
 /** Demo order figures, in INR — the currency toggle converts them at render. */
 const ORDER_PLAN_MONTHLY = 65000;
@@ -30,7 +31,7 @@ export default function CheckoutPage() {
     phone: '',
     cloudProvider: 'AWS',
     monthlyBudget: '50k-2L',
-    paymentMethod: 'card',
+    paymentMethod: 'card' as PaymentMethod,
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -42,6 +43,9 @@ export default function CheckoutPage() {
     if (step < 2) {
       setStep(step + 1);
     } else {
+      // Online payment isn't wired up yet (Razorpay integration pending) — this
+      // submits the enquiry for the sales team to follow up on, it does not
+      // charge anything.
       setLoading(true);
       setTimeout(() => {
         setLoading(false);
@@ -191,71 +195,14 @@ export default function CheckoutPage() {
                   </button>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setFormData((prev) => ({ ...prev, paymentMethod: 'card' }))}
-                    className={cn(
-                      'p-4 rounded-2xl border text-left flex flex-col gap-2 transition-all',
-                      formData.paymentMethod === 'card'
-                        ? 'border-accent bg-accent/10 text-text'
-                        : 'border-white/10 bg-white/5 text-text-muted'
-                    )}
-                  >
-                    <CreditCard className="w-5 h-5 text-accent" />
-                    <span className="text-xs font-bold">Credit / Debit Card</span>
-                    <span className="text-[10px] text-text-dim">Visa, Mastercard, Amex</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setFormData((prev) => ({ ...prev, paymentMethod: 'netbanking' }))}
-                    className={cn(
-                      'p-4 rounded-2xl border text-left flex flex-col gap-2 transition-all',
-                      formData.paymentMethod === 'netbanking'
-                        ? 'border-accent bg-accent/10 text-text'
-                        : 'border-white/10 bg-white/5 text-text-muted'
-                    )}
-                  >
-                    <Building2 className="w-5 h-5 text-accent" />
-                    <span className="text-xs font-bold">Corporate NetBanking / NEFT</span>
-                    <span className="text-[10px] text-text-dim">HDFC, ICICI, SBI, Axis</span>
-                  </button>
-                </div>
-
-                <div className="p-4 rounded-2xl bg-white/5 border border-white/8 space-y-4">
-                  <div className="space-y-1">
-                    <label className="block text-xs font-semibold text-text-muted uppercase tracking-wider">Card Number</label>
-                    <input
-                      type="text"
-                      placeholder="4111 2222 3333 4444"
-                      className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-text font-mono text-sm focus:outline-none focus:border-accent/50 transition-all placeholder-text-dim"
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-xs font-semibold text-text-muted uppercase tracking-wider">Expiry</label>
-                      <input
-                        type="text"
-                        placeholder="MM / YY"
-                        className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-text font-mono text-sm focus:outline-none focus:border-accent/50 transition-all placeholder-text-dim"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-semibold text-text-muted uppercase tracking-wider">CVV</label>
-                      <input
-                        type="password"
-                        placeholder="123"
-                        maxLength={4}
-                        className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-text font-mono text-sm focus:outline-none focus:border-accent/50 transition-all placeholder-text-dim"
-                      />
-                    </div>
-                  </div>
-                </div>
+                <PaymentMethodSelector
+                  value={formData.paymentMethod}
+                  onChange={(method) => setFormData((prev) => ({ ...prev, paymentMethod: method }))}
+                />
 
                 <div className="flex items-center gap-2 text-xs text-text-dim">
                   <Lock className="w-3.5 h-3.5 text-emerald-400" />
-                  <span>Encrypted 256-bit TLS transaction processed via Razorpay Enterprise</span>
+                  <span>This site is served over an encrypted (TLS) connection.</span>
                 </div>
 
                 <button
@@ -266,11 +213,11 @@ export default function CheckoutPage() {
                   {loading ? (
                     <>
                       <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      Initializing Cloud Tenant...
+                      Submitting...
                     </>
                   ) : (
                     <>
-                      Pay {price(ORDER_TOTAL)} & Activate Service <ShieldCheck className="w-4 h-4" />
+                      Submit Request ({price(ORDER_TOTAL)}) <ShieldCheck className="w-4 h-4" />
                     </>
                   )}
                 </button>
