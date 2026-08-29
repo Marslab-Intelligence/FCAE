@@ -1,81 +1,54 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { ShoppingBag, ArrowRight, Trash2, Shield, Plus, Minus, Check, ChevronRight } from 'lucide-react';
+import { ShoppingBag, ArrowRight, Trash2, Shield, Check, ChevronRight } from 'lucide-react';
 import { useCurrency } from '@/components/CurrencyProvider';
-
-interface CartItem {
-  id: string;
-  name: string;
-  category: string;
-  price: number;
-  billingPeriod: string;
-  quantity: number;
-}
-
-const initialCartItems: CartItem[] = [
-  {
-    id: 'plan-assure',
-    name: 'Assure (16/6) Managed Cloud Plan',
-    category: 'Core Service Tier',
-    price: 65000,
-    billingPeriod: 'month',
-    quantity: 1,
-  },
-  {
-    id: 'addon-sec-audit',
-    name: 'Cloud Security & SOC 2 Compliance Audit',
-    category: 'Security Add-On',
-    price: 35000,
-    billingPeriod: 'one-time',
-    quantity: 1,
-  },
-  {
-    id: 'addon-finops',
-    name: 'Advanced FinOps Dashboard & Cost Guardrails',
-    category: 'FinOps Add-On',
-    price: 15000,
-    billingPeriod: 'month',
-    quantity: 1,
-  },
-];
+import { getPlan, type PlanId } from '@/lib/package-catalog';
+import {
+  readBuilderSelection,
+  removeExtraFromBuilderSelection,
+  resolveFullSelection,
+  type SelectedItem,
+} from '@/lib/builder-cart';
 
 export default function CartPage() {
   const { price } = useCurrency();
-  const [items, setItems] = useState<CartItem[]>(initialCartItems);
+  const [hydrated, setHydrated] = useState(false);
+  const [planId, setPlanId] = useState<PlanId | null>(null);
+  const [extras, setExtras] = useState<SelectedItem[]>([]);
 
-  const updateQuantity = (id: string, delta: number) => {
-    setItems((prev) =>
-      prev
-        .map((item) => {
-          if (item.id === id) {
-            const newQty = item.quantity + delta;
-            return newQty > 0 ? { ...item, quantity: newQty } : null;
-          }
-          return item;
-        })
-        .filter(Boolean) as CartItem[]
-    );
+  // Reads localStorage after mount so SSR output matches the first client
+  // render (no localStorage on the server) — same pattern PackageBuilder uses.
+  useEffect(() => {
+    // localStorage needs `window`, so this can only run after mount — state
+    // starts empty to match SSR output, then this one-time read fills it in.
+    const saved = readBuilderSelection();
+    if (saved) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setPlanId(saved.planId);
+      setExtras(saved.extras);
+    }
+    setHydrated(true);
+  }, []);
+
+  const plan = planId ? getPlan(planId) : null;
+  const fullSelection = planId ? resolveFullSelection(planId, extras) : [];
+  const extraItems = fullSelection.filter((s) => !s.included && !s.custom);
+  const customItems = fullSelection.filter((s) => s.custom);
+
+  const removeExtra = (id: string) => {
+    setExtras(removeExtraFromBuilderSelection(id));
   };
 
-  const removeItem = (id: string) => {
-    setItems((prev) => prev.filter((item) => item.id !== id));
-  };
-
-  const subtotalMonthly = items
-    .filter((i) => i.billingPeriod === 'month')
-    .reduce((sum, i) => sum + i.price * i.quantity, 0);
-
-  const subtotalOneTime = items
-    .filter((i) => i.billingPeriod === 'one-time')
-    .reduce((sum, i) => sum + i.price * i.quantity, 0);
-
+  const addOnsTotal = extraItems.reduce((sum, s) => sum + s.price, 0);
+  const subtotalMonthly = (plan?.priceMonthly ?? 0) + addOnsTotal;
   const gstRate = 0.18;
-  const monthlyGst = subtotalMonthly * gstRate;
-  const oneTimeGst = subtotalOneTime * gstRate;
-  const totalDueToday = subtotalMonthly + monthlyGst + subtotalOneTime + oneTimeGst;
+  const gst = subtotalMonthly * gstRate;
+  const totalDueToday = subtotalMonthly + gst;
+
+  const isEmpty = hydrated && !plan;
 
   return (
     <div className="min-h-screen pt-32 pb-24 px-6 flex flex-col items-center justify-center">
@@ -93,12 +66,12 @@ export default function CartPage() {
           </div>
           <div>
             <h1 className="font-display font-bold text-3xl md:text-4xl text-text">Your Service Package</h1>
-            <p className="text-text-muted text-sm mt-0.5">Review your selected cloud managed tiers and add-ons before checkout</p>
+            <p className="text-text-muted text-sm mt-0.5">Review your selected cloud managed tier and add-ons before checkout</p>
           </div>
         </div>
       </div>
 
-      {items.length === 0 ? (
+      {isEmpty ? (
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -108,75 +81,97 @@ export default function CartPage() {
             <ShoppingBag className="w-8 h-8" />
           </div>
           <h2 className="font-display font-bold text-2xl text-text mb-2">Your cart is empty</h2>
-          <p className="text-text-muted text-sm mb-6">Explore our service plans or add-ons to build your custom package.</p>
+          <p className="text-text-muted text-sm mb-6">Configure a package in the builder, or explore our plans to get started.</p>
           <div className="flex justify-center gap-4">
             <Link
-              href="/plans"
+              href="/build"
               className="px-6 py-3 rounded-xl bg-accent text-white font-semibold hover:bg-accent-glow transition-all text-sm shadow-[0_0_25px_-5px_rgba(168,85,247,0.5)]"
+            >
+              Open Package Builder
+            </Link>
+            <Link
+              href="/plans"
+              className="px-6 py-3 rounded-xl bg-white/5 border border-white/10 text-text font-semibold hover:bg-white/10 transition-all text-sm"
             >
               Explore Plans
             </Link>
-            <Link
-              href="/add-ons"
-              className="px-6 py-3 rounded-xl bg-white/5 border border-white/10 text-text font-semibold hover:bg-white/10 transition-all text-sm"
-            >
-              Browse Add-Ons
-            </Link>
           </div>
         </motion.div>
-      ) : (
+      ) : !plan ? null : (
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Cart Items List */}
           <div className="lg:col-span-2 space-y-4">
             <div className="p-6 rounded-3xl border border-white/10 bg-white/3 backdrop-blur-xl space-y-4">
               <div className="flex items-center justify-between pb-4 border-b border-white/10 text-xs font-semibold uppercase tracking-wider text-text-dim">
                 <span>Item & Scope</span>
-                <span>Billing / Qty</span>
+                <span>Billing</span>
               </div>
 
-              {items.map((item) => (
+              {/* Base Tier — not individually removable; change it in the builder */}
+              <div className="p-4 rounded-2xl bg-white/5 border border-white/8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="space-y-1">
+                  <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-md bg-purple-500/15 text-purple-300 border border-purple-500/20">
+                    Core Service Tier
+                  </span>
+                  <h3 className="font-display font-bold text-base text-text">{plan.name} Managed Cloud Plan</h3>
+                  <p className="text-xs text-text-muted">{price(plan.priceMonthly)} <span className="text-text-dim">/month</span></p>
+                </div>
+                <div className="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end border-t sm:border-t-0 border-white/10 pt-3 sm:pt-0">
+                  <p className="font-display font-bold text-text text-base">{price(plan.priceMonthly)}</p>
+                  <Link
+                    href={`/build?plan=${plan.id}`}
+                    className="text-[11px] text-accent hover:underline whitespace-nowrap"
+                  >
+                    Change tier
+                  </Link>
+                </div>
+              </div>
+
+              {extraItems.map((item) => (
                 <div
                   key={item.id}
                   className="p-4 rounded-2xl bg-white/5 border border-white/8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 transition-all hover:border-white/15"
                 >
                   <div className="space-y-1">
                     <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-md bg-accent/15 text-accent border border-accent/20">
-                      {item.category}
+                      {item.categoryLabel}
                     </span>
                     <h3 className="font-display font-bold text-base text-text">{item.name}</h3>
                     <p className="text-xs text-text-muted">
-                      {price(item.price)}{' '}
-                      <span className="text-text-dim">/{item.billingPeriod}</span>
+                      {price(item.price)} <span className="text-text-dim">/month</span>
                     </p>
                   </div>
 
                   <div className="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end border-t sm:border-t-0 border-white/10 pt-3 sm:pt-0">
-                    <div className="flex items-center gap-2 rounded-xl bg-white/5 border border-white/10 p-1">
-                      <button
-                        onClick={() => updateQuantity(item.id, -1)}
-                        className="w-7 h-7 rounded-lg hover:bg-white/10 text-text-muted flex items-center justify-center transition-colors"
-                        aria-label="Decrease quantity"
-                      >
-                        <Minus className="w-3.5 h-3.5" />
-                      </button>
-                      <span className="text-sm font-semibold text-text px-2">{item.quantity}</span>
-                      <button
-                        onClick={() => updateQuantity(item.id, 1)}
-                        className="w-7 h-7 rounded-lg hover:bg-white/10 text-text-muted flex items-center justify-center transition-colors"
-                        aria-label="Increase quantity"
-                      >
-                        <Plus className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-
-                    <p className="font-display font-bold text-text text-base">
-                      {price(item.price * item.quantity)}
-                    </p>
-
+                    <p className="font-display font-bold text-text text-base">{price(item.price)}</p>
                     <button
-                      onClick={() => removeItem(item.id)}
+                      onClick={() => removeExtra(item.id)}
                       className="p-2 rounded-xl hover:bg-red-500/15 hover:text-red-400 text-text-dim transition-colors"
-                      aria-label="Remove item"
+                      aria-label={`Remove ${item.name}`}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+
+              {customItems.map((item) => (
+                <div
+                  key={item.id}
+                  className="p-4 rounded-2xl bg-cyan/5 border border-cyan/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+                >
+                  <div className="space-y-1">
+                    <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-md bg-cyan/15 text-cyan border border-cyan/25">
+                      Custom Request
+                    </span>
+                    <h3 className="font-display font-bold text-base text-text">{item.name}</h3>
+                  </div>
+                  <div className="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end border-t sm:border-t-0 border-white/10 pt-3 sm:pt-0">
+                    <p className="font-display font-bold text-cyan text-sm">Scoped on call</p>
+                    <button
+                      onClick={() => removeExtra(item.id)}
+                      className="p-2 rounded-xl hover:bg-red-500/15 hover:text-red-400 text-text-dim transition-colors"
+                      aria-label={`Remove ${item.name}`}
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -204,26 +199,28 @@ export default function CartPage() {
 
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between text-text-muted">
-                  <span>Monthly Services</span>
-                  <span className="font-mono text-text">{price(subtotalMonthly)}/mo</span>
+                  <span>Base Tier ({plan.name})</span>
+                  <span className="font-mono text-text">{price(plan.priceMonthly)}/mo</span>
                 </div>
-                {subtotalOneTime > 0 && (
-                  <div className="flex justify-between text-text-muted">
-                    <span>One-Time Add-Ons</span>
-                    <span className="font-mono text-text">{price(subtotalOneTime)}</span>
+                <div className="flex justify-between text-text-muted">
+                  <span>Add-Ons ({extraItems.length})</span>
+                  <span className="font-mono text-text">{extraItems.length > 0 ? `${price(addOnsTotal)}/mo` : '—'}</span>
+                </div>
+                {customItems.length > 0 && (
+                  <div className="flex justify-between text-cyan">
+                    <span>Custom Requests ({customItems.length})</span>
+                    <span>To be priced</span>
                   </div>
                 )}
                 <div className="flex justify-between text-text-muted">
                   <span>GST (18%)</span>
-                  <span className="font-mono text-text">
-                    {price(monthlyGst + oneTimeGst)}
-                  </span>
+                  <span className="font-mono text-text">{price(gst)}</span>
                 </div>
 
                 <div className="pt-4 border-t border-white/10 flex justify-between items-baseline">
                   <div>
                     <p className="font-display font-bold text-lg text-text">Total Due Today</p>
-                    <p className="text-[11px] text-text-dim">Includes 1st month + one-time fees + GST</p>
+                    <p className="text-[11px] text-text-dim">Includes 1st month + GST</p>
                   </div>
                   <span className="font-display font-bold text-2xl text-accent">
                     {price(totalDueToday)}

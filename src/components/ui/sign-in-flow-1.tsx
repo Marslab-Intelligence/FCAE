@@ -429,6 +429,8 @@ export const SignInPage = ({ className, mode = "sign-up" }: SignInPageProps) => 
       const formData = new FormData();
       formData.append("email", email);
       formData.append("otp", otpCode);
+      const redirectParam = searchParams?.get("redirect");
+      if (redirectParam) formData.append("redirect", redirectParam);
       const res = await verifyOtpAction({}, formData);
       if (res?.error) {
         setErrorMsg(res.error);
@@ -439,7 +441,7 @@ export const SignInPage = ({ className, mode = "sign-up" }: SignInPageProps) => 
       // Next.js redirect throws a digest containing NEXT_REDIRECT
       const isRedirect = err && typeof err === 'object' && 'digest' in err && typeof (err as { digest?: string }).digest === 'string' && (err as { digest: string }).digest.includes('NEXT_REDIRECT');
       if (isRedirect) {
-        // Navigation to /account is underway by Next.js router
+        // Navigation (to /account, or ?redirect= if one was given) is underway.
         return;
       }
     }

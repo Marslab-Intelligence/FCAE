@@ -70,6 +70,42 @@ export const orders = pgTable('orders', {
   paidAt: timestamp('paid_at'),
 });
 
+export const subscriptionStatusEnum = pgEnum('subscription_status', [
+  'pending',
+  'active',
+  'paused',
+  'cancelled',
+]);
+
+/**
+ * The ongoing recurring relationship a paid plan creates — distinct from
+ * `orders` (one checkout attempt) because a plan renews monthly without a
+ * new checkout each time. `orderId` points at the order that originally
+ * created it, but is nullable: the CRM "deal won" webhook (AGENTS.md #9)
+ * could in principle mark someone an active client without FCAE ever having
+ * run a checkout for them (an offline/manually-negotiated deal). Starts
+ * `pending` and only becomes `active` once a real payment succeeds — with
+ * Razorpay not wired up yet, every row here is `pending` today, same as
+ * `orders`, but the shape is ready for when it isn't.
+ */
+export const subscriptions = pgTable('subscriptions', {
+  id: text('id').primaryKey().$defaultFn(() => randomUUID()),
+  userId: text('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  orderId: text('order_id').references(() => orders.id, { onDelete: 'set null' }),
+  planId: text('plan_id').notNull(),
+  status: subscriptionStatusEnum('status').notNull().default('pending'),
+  // Whole currency units (rupees) — same convention as orders.amount.
+  amountMonthly: integer('amount_monthly').notNull(),
+  currency: text('currency').notNull().default('INR'),
+  currentPeriodStart: timestamp('current_period_start'),
+  currentPeriodEnd: timestamp('current_period_end'),
+  cancelAtPeriodEnd: boolean('cancel_at_period_end').notNull().default(false),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  canceledAt: timestamp('canceled_at'),
+});
+
 export const invoiceStatusEnum = pgEnum('invoice_status', ['draft', 'issued', 'paid', 'void']);
 
 /**
@@ -86,6 +122,10 @@ export const invoices = pgTable('invoices', {
   orderId: text('order_id')
     .notNull()
     .references(() => orders.id, { onDelete: 'cascade' }),
+  // Nullable: set for a recurring billing-cycle invoice generated off a
+  // subscription; null for a one-time invoice that only traces to `orderId`
+  // (e.g. the SOC 2 audit add-on on the checkout page, which isn't recurring).
+  subscriptionId: text('subscription_id').references(() => subscriptions.id, { onDelete: 'set null' }),
   userId: text('user_id')
     .notNull()
     .references(() => users.id, { onDelete: 'cascade' }),

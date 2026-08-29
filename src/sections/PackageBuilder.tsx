@@ -12,22 +12,14 @@ import { cn } from '@/lib/utils';
 import { LeadCaptureModal } from '@/components/LeadCaptureModal';
 import {
   basePlans, getPlan, addOnCategories, allAddOns,
-  includedAddOnsForPlan, isIncludedInPlan, type PlanId, type AddOn,
+  isIncludedInPlan, type PlanId, type AddOn,
 } from '@/lib/package-catalog';
 import { useCurrency } from '@/components/CurrencyProvider';
-
-interface SelectedItem {
-  id: string;
-  name: string;
-  price: number;
-  categoryLabel: string;
-  custom?: boolean;
-  note?: string;
-  /** Bundled with the chosen tier — always selected, and never billed as an extra. */
-  included?: boolean;
-}
-
-const STORAGE_KEY = 'sid-package-builder';
+import {
+  BUILDER_STORAGE_KEY as STORAGE_KEY,
+  resolveFullSelection,
+  type SelectedItem,
+} from '@/lib/builder-cart';
 
 const categoryChips = [
   { id: 'all', label: 'All Services' },
@@ -256,20 +248,7 @@ export function PackageBuilder({
   // tiers re-derives them: upgrading pulls newly covered services in,
   // downgrading drops the ones no longer covered. A service the client added
   // themselves simply stops being billed separately once a tier covers it.
-  const selected = useMemo<SelectedItem[]>(() => {
-    const bundled = includedAddOnsForPlan(planId);
-    const bundledIds = new Set(bundled.map((a) => a.id));
-    return [
-      ...bundled.map((a) => ({
-        id: a.id,
-        name: a.name,
-        price: a.price,
-        categoryLabel: a.categoryLabel,
-        included: true,
-      })),
-      ...extras.filter((e) => !bundledIds.has(e.id)),
-    ];
-  }, [planId, extras]);
+  const selected = useMemo<SelectedItem[]>(() => resolveFullSelection(planId, extras), [planId, extras]);
 
   const selectedIds = useMemo(() => new Set(selected.map((s) => s.id)), [selected]);
 
@@ -696,14 +675,13 @@ export function PackageBuilder({
     return Math.max(650, Math.max(...maximizedTopology.nodes.map((n) => n.y)) + 100);
   }, [maximizedTopology.nodes]);
 
-  const summaryQuery = new URLSearchParams({
-    plan: plan.name,
-    services: selected.map((s) => s.name).join(', '),
-  }).toString();
   // Signed-in clients already have an account, so they go straight to the
-  // contact hand-off; everyone else fills in the lead form first and is then
-  // sent to sign-up, where the email they just gave becomes their login.
-  const ctaHref = isSignedIn ? `/contact?${summaryQuery}` : `/signup?redirect=${encodeURIComponent(`/build?plan=${planId}`)}`;
+  // cart to review what they've configured (read from the same localStorage
+  // selection this component persists — see src/lib/builder-cart.ts);
+  // everyone else fills in the lead form first (captured as a CRM Deal) and
+  // is then sent to sign-up, where the email they just gave becomes their
+  // login, landing back here signed in with the same plan preselected.
+  const ctaHref = '/cart';
   const leadRedirect = `/sign-up?redirect=${encodeURIComponent(`/build?plan=${planId}`)}`;
 
   return (
@@ -1405,7 +1383,7 @@ export function PackageBuilder({
                 {isSignedIn ? (
                   <Link href={ctaHref} className="block">
                     <button className="w-full flex items-center justify-center gap-1.5 py-3 rounded-xl bg-linear-to-r from-accent to-purple-600 text-white font-bold text-xs hover:from-accent-glow hover:to-purple-500 shadow-[0_0_20px_-8px_rgba(168,85,247,0.5)] transition-all">
-                      Request Custom Package <ArrowRight className="w-3.5 h-3.5" />
+                      Review Cart &amp; Checkout <ArrowRight className="w-3.5 h-3.5" />
                     </button>
                   </Link>
                 ) : (

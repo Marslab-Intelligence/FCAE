@@ -13,6 +13,20 @@ import { adoptPendingPlan } from '@/lib/pending-plan';
 const OTP_TTL_MS = 10 * 60 * 1000;   // 10 minutes
 const MAX_ATTEMPTS = 5;
 
+/**
+ * Only ever follow a same-site relative path — a `redirect` value straight
+ * off the query string could otherwise be used for an open-redirect attack
+ * (e.g. `?redirect=https://evil.example` or `?redirect=//evil.example`,
+ * which browsers treat as protocol-relative to another host).
+ */
+function safeRedirectTarget(value: FormDataEntryValue | null): string {
+  const target = typeof value === 'string' ? value : '';
+  if (target.startsWith('/') && !target.startsWith('//') && !target.includes('://')) {
+    return target;
+  }
+  return '/account';
+}
+
 export interface OtpActionState {
   error?: string;
   success?: boolean;
@@ -108,5 +122,5 @@ export async function verifyOtpAction(
     };
   }
 
-  redirect('/account');
+  redirect(safeRedirectTarget(formData.get('redirect')));
 }
