@@ -55,6 +55,8 @@ const GlassSurface: React.FC<GlassSurfaceProps> = ({
   const redGradId = `red-grad-${uniqueId}`;
   const blueGradId = `blue-grad-${uniqueId}`;
 
+  const [svgSupported, setSvgSupported] = useState(false);
+
   const supportsSVGFilters = () => {
     if (typeof window === 'undefined' || typeof document === 'undefined') {
       return false;
@@ -73,7 +75,15 @@ const GlassSurface: React.FC<GlassSurfaceProps> = ({
     return div.style.backdropFilter !== '';
   };
 
-  const [svgSupported] = useState(() => supportsSVGFilters());
+  useEffect(() => {
+    // Feature detection needs `document`/`navigator`, so it can only run
+    // after mount — state starts `false` to match SSR output, then flips
+    // once if the browser supports SVG backdrop filters.
+    if (supportsSVGFilters()) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setSvgSupported(true);
+    }
+  }, []);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const feImageRef = useRef<SVGFEImageElement>(null);

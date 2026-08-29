@@ -112,86 +112,99 @@ export function InteractiveDemo() {
     <section
       id="qna"
       ref={sectionRef}
-      className="relative section-y overflow-hidden"
+      className="relative py-12 lg:py-20 overflow-hidden"
       aria-labelledby="qna-heading"
     >
       <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
         <div className="absolute top-1/3 right-1/4 w-150 h-150 rounded-full bg-linear-to-r from-accent/10 via-transparent to-purple-600/10 blur-3xl" />
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-6">
-        <div className="text-center mb-12">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="text-center mb-6 sm:mb-10">
           <motion.span
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-xl text-sm font-medium text-white/55 mb-6"
+            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-xl text-xs sm:text-sm font-medium text-white/60 mb-3 sm:mb-4"
           >
-            <HelpCircle className="w-4 h-4 text-accent" />
+            <HelpCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-accent" />
             Service Activity Explanation
           </motion.span>
           <h2
             id="qna-heading"
-            className="qna-headline font-display font-semibold text-fluid-h2 tracking-tight leading-tight text-white mb-4"
+            className="qna-headline font-display font-semibold text-2xl sm:text-3xl lg:text-4xl tracking-tight leading-tight text-white mb-2 sm:mb-3"
           >
             <span className="stellar-gradient-text">Answering Your Core Business Questions</span>
           </h2>
-          <p className="text-lg md:text-xl text-white/55 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-sm sm:text-base lg:text-lg text-white/60 max-w-2xl mx-auto leading-relaxed">
             Click any question below to see the exact SID service activity and deliverable designed to address it.
           </p>
         </div>
 
         {/* Q&A Interactive Accordion / Selector */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* Question List */}
-          <div className="lg:col-span-5 space-y-2 max-h-125 overflow-y-auto pr-2 custom-scrollbar" data-lenis-prevent>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-8 items-start">
+          {/* Question List - Adaptively scaled max height so it fits any screen height cleanly */}
+          <div
+            className="lg:col-span-5 space-y-1.5 sm:space-y-2 max-h-[46vh] sm:max-h-[50vh] lg:max-h-110 overflow-y-auto pr-1.5 custom-scrollbar"
+            data-lenis-prevent
+          >
             {qnaList.map((item, idx) => (
               <button
                 key={item.question}
                 onClick={() => setSelectedIndex(idx)}
                 className={cn(
-                  'reveal-row w-full text-left p-4 rounded-2xl border transition-all duration-300 flex items-center justify-between gap-4',
+                  'reveal-row w-full text-left py-2.5 px-3 sm:py-3 sm:px-4 rounded-xl border transition-all duration-300 flex items-center justify-between gap-2.5',
                   selectedIndex === idx
                     ? 'bg-accent/15 border-accent text-white shadow-[0_0_20px_rgba(168,85,247,0.3)]'
-                    : 'bg-white/5 border-white/10 text-white/55 hover:bg-white/10 hover:text-white'
+                    : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10 hover:text-white'
                 )}
               >
-                <div className="flex items-center gap-3">
-                  <MessageSquare className={cn('w-4 h-4 shrink-0', selectedIndex === idx ? 'text-accent' : 'text-white/45')} />
-                  <span className="text-sm font-medium leading-snug">{item.question}</span>
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <MessageSquare className={cn('w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0', selectedIndex === idx ? 'text-accent' : 'text-white/40')} />
+                  <span className="text-xs sm:text-sm font-medium leading-snug truncate">{item.question}</span>
                 </div>
-                <ChevronRight className={cn('w-4 h-4 shrink-0 transition-transform', selectedIndex === idx && 'translate-x-1 text-accent')} />
+                <ChevronRight className={cn('w-3.5 h-3.5 shrink-0 transition-transform', selectedIndex === idx && 'translate-x-1 text-accent')} />
               </button>
             ))}
           </div>
 
           {/* Active Detail Showcase Card */}
-          <div className="lg:col-span-7">
+          <div className="lg:col-span-7 lg:sticky lg:top-24">
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeItem.activity}
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.3 }}
-                className="p-8 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-xl shadow-2xl relative overflow-hidden"
+                transition={{ duration: 0.25 }}
+                className="p-4 sm:p-6 lg:p-7 rounded-2xl sm:rounded-3xl bg-white/5 border border-white/10 backdrop-blur-xl shadow-2xl relative overflow-hidden"
               >
-                <div className="absolute top-0 right-0 w-48 h-48 bg-linear-to-bl from-accent/20 via-transparent to-transparent pointer-events-none rounded-bl-full" />
+                <div className="absolute top-0 right-0 w-36 h-36 bg-linear-to-bl from-accent/20 via-transparent to-transparent pointer-events-none rounded-bl-full" />
 
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/20 border border-accent/30 text-accent text-xs font-semibold uppercase tracking-wider mb-6">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/20 border border-accent/30 text-accent text-[11px] sm:text-xs font-semibold uppercase tracking-wider mb-3 sm:mb-4">
                   <Sparkles className="w-3.5 h-3.5" /> Corresponding SID Activity
                 </div>
 
-                <h3 className="text-xl sm:text-2xl lg:text-3xl font-display font-semibold text-white mb-4">{activeItem.activity}</h3>
+                <h3 className="text-lg sm:text-2xl lg:text-3xl font-display font-semibold text-white mb-3 sm:mb-4">
+                  {activeItem.activity}
+                </h3>
 
-                <div className="p-4 rounded-2xl bg-white/5 border border-white/10 mb-6">
-                  <span className="text-xs font-semibold text-white/45 uppercase tracking-wider block mb-1">Primary Question Answered</span>
-                  <p className="text-lg font-medium text-accent italic">{activeItem.question}</p>
+                <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-white/5 border border-white/10 mb-3 sm:mb-4">
+                  <span className="text-[10px] sm:text-xs font-semibold text-white/45 uppercase tracking-wider block mb-1">
+                    Primary Question Answered
+                  </span>
+                  <p className="text-sm sm:text-base lg:text-lg font-medium text-accent italic">
+                    {activeItem.question}
+                  </p>
                 </div>
 
-                <div className="space-y-2">
-                  <span className="text-xs font-semibold text-white/45 uppercase tracking-wider block">Short Description</span>
-                  <p className="text-white/55 text-base leading-relaxed">{activeItem.description}</p>
+                <div className="space-y-1">
+                  <span className="text-[10px] sm:text-xs font-semibold text-white/45 uppercase tracking-wider block">
+                    Short Description
+                  </span>
+                  <p className="text-white/70 text-xs sm:text-sm lg:text-base leading-relaxed">
+                    {activeItem.description}
+                  </p>
                 </div>
               </motion.div>
             </AnimatePresence>

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import type { LucideIcon } from 'lucide-react';
 import { 
@@ -14,6 +14,7 @@ import {
   motion,
   useInView,
   useMotionValue,
+  useMotionValueEvent,
   useReducedMotion,
   useScroll,
   useSpring,
@@ -160,6 +161,22 @@ export default function PlanDetailClient({
   const topOrbY = useTransform(scrollYProgress, [0, 1], [30, -45]);
   const bottomOrbY = useTransform(scrollYProgress, [0, 1], [-25, 45]);
 
+  // Floating tier-switcher bar: hide on scroll-down, reveal on scroll-up —
+  // it's `fixed`, so without this it just sits on top of content forever.
+  const { scrollY } = useScroll();
+  const lastScrollY = useRef(0);
+  const [switcherHidden, setSwitcherHidden] = useState(false);
+
+  useMotionValueEvent(scrollY, 'change', (latest) => {
+    const diff = latest - lastScrollY.current;
+    // Ignore tiny jitter (mobile momentum scroll, trackpad noise) and stay
+    // visible near the very top regardless of direction.
+    if (Math.abs(diff) > 4) {
+      setSwitcherHidden(diff > 0 && latest > 120);
+    }
+    lastScrollY.current = latest;
+  });
+
   // Left & Right Service items mapped dynamically per plan or falling back to default Cloud Operations
   const leftCloudServices = plan.architectureServicesLeft || [
     {
@@ -208,7 +225,11 @@ export default function PlanDetailClient({
     <div className={cn('min-h-screen text-white overflow-x-hidden transition-colors duration-700', plan.bgPage)}>
       
       {/* ── Persistent Tier-Accented Floating Glass Package Switcher Bar ── */}
-      <div className="fixed top-24 z-50 w-full px-4 pointer-events-none">
+      <motion.div
+        className="fixed top-24 z-50 w-full px-4 pointer-events-none"
+        animate={{ y: switcherHidden ? -140 : 0, opacity: switcherHidden ? 0 : 1 }}
+        transition={{ duration: 0.35, ease: 'easeInOut' }}
+      >
         <GlassSurface
           width="100%"
           height="auto"
@@ -277,7 +298,7 @@ export default function PlanDetailClient({
             </Link>
           </div>
         </GlassSurface>
-      </div>
+      </motion.div>
 
       {/* ── Full-Screen Edge-to-Edge Kinetic Hero Section (UNTOUCHED BACKGROUND IMAGES/VIDEOS) ── */}
       <section className="relative w-full min-h-[92vh] lg:min-h-screen flex flex-col justify-between pt-48 md:pt-52 lg:pt-56 pb-16 px-4 sm:px-6 lg:px-12 overflow-hidden border-b border-white/10">
