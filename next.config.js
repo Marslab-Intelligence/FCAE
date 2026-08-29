@@ -25,6 +25,15 @@ const nextConfig = {
       '@gsap/react',
     ],
   },
+
+  // /sign-up is the canonical URL (used everywhere internally); /signup was a
+  // byte-for-byte duplicate route — redirect instead of serving both, so
+  // there's exactly one indexable URL per intent.
+  async redirects() {
+    return [
+      { source: '/signup', destination: '/sign-up', permanent: true },
+    ];
+  },
 }
 
 // `next dev` and `next build` get separate output directories. Sharing one

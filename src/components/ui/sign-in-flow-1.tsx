@@ -41,7 +41,11 @@ interface ShaderProps {
 
 interface SignInPageProps {
   className?: string;
-  mode?: "sign-in" | "sign-up";
+  // "sign-in"/"sign-up" are the pre-payment identity, tied to /build — copy
+  // talks about creating/accessing an account to save a package config.
+  // "login" is the post-onboarding identity for /login: an existing paying
+  // client returning to their dashboard, not someone starting a new signup.
+  mode?: "sign-in" | "sign-up" | "login";
 }
       
 export const CanvasRevealEffect = ({
@@ -377,8 +381,14 @@ export const SignInPage = ({ className, mode = "sign-up" }: SignInPageProps) => 
     return () => cancelAnimationFrame(id);
   }, [searchParams]);
 
-  const titleText = mode === "sign-up" ? "Create your Account" : "Welcome Back";
-  const subtitleText = mode === "sign-up" ? "Sign up to start scaling your cloud" : "Sign in to manage your cloud infrastructure";
+  const titleText = mode === "sign-up" ? "Create your Account" : mode === "login" ? "Client Login" : "Welcome Back";
+  const subtitleText =
+    mode === "sign-up"
+      ? "Sign up to start scaling your cloud"
+      : mode === "login"
+        ? "Log in to access your SIDCORPTECH client dashboard"
+        : "Sign in to manage your cloud infrastructure";
+  const googleCtaText = mode === "login" ? "Log in with Google" : "Sign in with Google";
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -543,7 +553,7 @@ export const SignInPage = ({ className, mode = "sign-up" }: SignInPageProps) => 
                         className="backdrop-blur-[2px] w-full flex items-center justify-center gap-3 bg-white/5 hover:bg-white/10 hover:border-white/20 text-white border border-white/10 rounded-full py-3 px-4 transition-all cursor-pointer text-sm font-medium"
                       >
                         <GoogleIcon className="w-4.5 h-4.5 shrink-0" />
-                        <span>Sign in with Google</span>
+                        <span>{googleCtaText}</span>
                       </a>
                       
                       <div className="flex items-center gap-4">
@@ -588,6 +598,8 @@ export const SignInPage = ({ className, mode = "sign-up" }: SignInPageProps) => 
                     <div className="text-xs text-white/50 pt-4">
                       {mode === "sign-up" ? (
                         <span>Already have an account? <Link href="/sign-in" className="underline text-white hover:text-white/80 transition-colors">Sign in</Link></span>
+                      ) : mode === "login" ? (
+                        <span>New to SIDCORPTECH? <Link href="/plans" className="underline text-white hover:text-white/80 transition-colors">Explore our plans</Link></span>
                       ) : (
                         <span>Don&apos;t have an account yet? <Link href="/sign-up" className="underline text-white hover:text-white/80 transition-colors">Sign up</Link></span>
                       )}
