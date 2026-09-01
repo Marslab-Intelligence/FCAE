@@ -1,7 +1,5 @@
 import { Hero } from '@/sections/Hero';
 import { LivingCloudSection } from '@/sections/LivingCloudSection';
-import { CloudPillarsShowcase } from '@/sections/CloudPillarsShowcase';
-import { Features } from '@/sections/Features';
 import { InteractiveDemo } from '@/sections/InteractiveDemo';
 import { Pricing } from '@/sections/Pricing';
 import { getCurrentUser } from '@/lib/auth';
@@ -25,8 +23,6 @@ export default async function HomePage() {
     <>
       <Hero />
       <LivingCloudSection />
-      <CloudPillarsShowcase />
-      <Features />
       <InteractiveDemo />
       <Pricing isSignedIn={!!user} savedTier={savedTier} />
       <PlanInteractiveShowcase />
