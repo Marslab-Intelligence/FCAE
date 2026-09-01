@@ -351,8 +351,8 @@ export function PackageBuilder({
     const nodes: TopologyNode[] = [];
     const links: TopologyLink[] = [];
 
-    const rootX = 300;
-    const rootY = 45;
+    const rootX = 300; // Centered in a 600 width viewBox
+    const rootY = 36;
     const rootColor = planId === 'foundation' ? '#a855f7' : planId === 'care' ? '#10b981' : planId === 'assure' ? '#f59e0b' : '#3b82f6';
     
     const actualRootX = customPositions['root']?.x ?? rootX;
@@ -372,9 +372,9 @@ export function PackageBuilder({
     if (selected.length === 0) {
       // 3 Ghost category hubs (staggered for organic layout)
       const ghosts = [
-        { id: 'g-ops', label: 'Cloud Ops', color: '#06b6d4', x: 140, y: 140, childX: 120, childY: 240, childLabel: 'Monitoring' },
-        { id: 'g-sec', label: 'Security', color: '#a855f7', x: 300, y: 160, childX: 320, childY: 240, childLabel: 'Compliance' },
-        { id: 'g-dev', label: 'DevOps', color: '#f97316', x: 460, y: 140, childX: 440, childY: 240, childLabel: 'Infrastructure' },
+        { id: 'g-ops', label: 'Cloud Ops', color: '#06b6d4', x: 140, y: 100, childX: 120, childY: 175, childLabel: 'Monitoring' },
+        { id: 'g-sec', label: 'Security', color: '#a855f7', x: 300, y: 115, childX: 310, childY: 175, childLabel: 'Compliance' },
+        { id: 'g-dev', label: 'DevOps', color: '#f97316', x: 460, y: 100, childX: 445, childY: 175, childLabel: 'Infrastructure' },
       ];
 
       ghosts.forEach((g) => {
@@ -391,8 +391,8 @@ export function PackageBuilder({
         });
         links.push({
           id: `link-root-${g.id}`,
-          from: { x: actualRootX, y: actualRootY + 30 },
-          to: { x: actualHubX, y: actualHubY - 17 },
+          from: { x: actualRootX, y: actualRootY + 24 },
+          to: { x: actualHubX, y: actualHubY - 14 },
           color: g.color,
           animated: false,
           ghost: true,
@@ -412,8 +412,8 @@ export function PackageBuilder({
         });
         links.push({
           id: `link-${g.id}-child`,
-          from: { x: actualHubX, y: actualHubY + 17 },
-          to: { x: actualChildX, y: actualChildY - 25 },
+          from: { x: actualHubX, y: actualHubY + 14 },
+          to: { x: actualChildX, y: actualChildY - 18 },
           color: g.color,
           animated: false,
           ghost: true,
@@ -443,14 +443,14 @@ export function PackageBuilder({
       const numCats = activeGroups.length;
 
       // Distribute categories dynamically in a 600 width viewBox
-      const totalWidth = Math.min(420, (numCats - 1) * 120); // 120px spacing per category, up to 420px total
+      const totalWidth = Math.min(420, (numCats - 1) * 110);
       const startX = 300 - totalWidth / 2;
 
       activeGroups.forEach((group, groupIdx) => {
-        // Stagger category hubs vertically to create an irregular tree shape
-        const rawHubX = numCats === 1 ? 300 : startX + (totalWidth / (numCats - 1)) * groupIdx;
-        const hubX = rawHubX + getHashOffset(group.label, 20); // up to +/- 10px stagger
-        const hubY = 150 + (groupIdx % 2 === 0 ? 10 : -10) + getHashOffset(group.label, 12); // up to +/- 6px stagger
+        // Stagger category hubs vertically
+        const rawHubX = numCats === 1 ? 300 : startX + (totalWidth / Math.max(1, numCats - 1)) * groupIdx;
+        const hubX = rawHubX + getHashOffset(group.label, 12);
+        const hubY = 105 + (groupIdx % 2 === 0 ? 6 : -6) + getHashOffset(group.label, 8);
         const hubId = `hub-${group.label}`;
 
         const actualHubX = customPositions[hubId]?.x ?? hubX;
@@ -467,21 +467,20 @@ export function PackageBuilder({
 
         links.push({
           id: `link-root-${hubId}`,
-          from: { x: actualRootX, y: actualRootY + 30 },
-          to: { x: actualHubX, y: actualHubY - 17 },
+          from: { x: actualRootX, y: actualRootY + 24 },
+          to: { x: actualHubX, y: actualHubY - 14 },
           color: group.color,
           animated: true,
         });
 
-        // Child services staggered horizontally under their hub in a beautiful zigzag chain
         let prevX = actualHubX;
         let prevY = actualHubY;
-        let prevOffset = 17; // hub radius
+        let prevOffset = 14;
 
         group.items.forEach((item, itemIdx) => {
-          const xOffset = numCats <= 2 ? 22 : numCats === 3 ? 15 : 10;
-          const serviceX = hubX + (itemIdx % 2 === 0 ? -xOffset : xOffset) + getHashOffset(item.name, 10);
-          const serviceY = hubY + 90 + itemIdx * 75 + getHashOffset(item.name, 8);
+          const xOffset = numCats <= 2 ? 14 : 10;
+          const serviceX = hubX + (itemIdx % 2 === 0 ? -xOffset : xOffset) + getHashOffset(item.name, 6);
+          const serviceY = hubY + 60 + itemIdx * 54 + getHashOffset(item.name, 5);
           const serviceId = `service-${item.id}`;
 
           const actualServiceX = customPositions[serviceId]?.x ?? serviceX;
@@ -502,14 +501,14 @@ export function PackageBuilder({
           links.push({
             id: `link-${hubId}-${serviceId}`,
             from: { x: prevX, y: prevY + prevOffset },
-            to: { x: actualServiceX, y: actualServiceY - 25 },
+            to: { x: actualServiceX, y: actualServiceY - 18 },
             color: group.color,
             animated: true,
           });
 
           prevX = actualServiceX;
           prevY = actualServiceY;
-          prevOffset = 25; // service radius
+          prevOffset = 18;
         });
       });
     }
@@ -518,8 +517,8 @@ export function PackageBuilder({
   }, [planId, selected, plan.name, plan.icon, customPositions]);
 
   const maxNodeY = useMemo(() => {
-    if (topology.nodes.length === 0) return 400;
-    return Math.max(400, Math.max(...topology.nodes.map((n) => n.y)) + 60);
+    if (topology.nodes.length === 0) return 240;
+    return Math.max(220, Math.max(...topology.nodes.map((n) => n.y)) + 36);
   }, [topology.nodes]);
 
   const maximizedTopology = useMemo(() => {
@@ -770,125 +769,101 @@ export function PackageBuilder({
           </button>
         </div>
 
-        {/* ── Dashboard Grid ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_1.6fr_1.3fr] gap-4 items-stretch flex-1 min-h-0">
-
-          {/* ═══ COLUMN 1: Base Tier Options & Custom ═══ */}
-          <div className={cn(
-            "lg:flex flex-col gap-4 h-full min-h-0",
-            mobileTab === 'base' ? 'flex' : 'hidden lg:flex'
-          )}>
-            <div className="flex-1 rounded-2xl border border-white/10 bg-[#0a0a0f]/60 p-4 flex flex-col overflow-hidden min-h-0">
-              <h2 className="text-xs font-bold uppercase tracking-wider text-text-dim mb-3 flex items-center gap-1">
-                <span>01</span> Choose Base Tier
-              </h2>
-
-              <div className="space-y-2 overflow-y-auto flex-1 pr-1 -mr-1" data-lenis-prevent>
-                {basePlans.map((p) => {
-                  const active = p.id === planId;
-                  return (
-                    <button
-                      key={p.id}
-                      onClick={() => setPlanId(p.id)}
-                      style={{ '--pg': p.glow } as React.CSSProperties}
-                      className={cn(
-                        'w-full text-left rounded-xl border p-3 transition-all duration-300 relative group overflow-hidden',
-                        active
-                          ? 'bg-white/8 border-white/20 shadow-[0_0_24px_-10px_var(--pg)]'
-                          : 'bg-white/3 border-white/8 hover:border-white/15 hover:bg-white/5'
-                      )}
-                    >
-                      {/* Left accent color strip */}
-                      <div className={cn(
-                        'absolute left-0 top-0 bottom-0 w-1 transition-all',
-                        active ? p.accentText.replace('text-', 'bg-') : 'bg-transparent'
-                      )} />
-
-                      <div className="pl-2">
-                        <div className="flex items-center justify-between mb-1">
-                          <div className="flex items-center gap-1.5">
-                            <span className="text-base">{p.icon}</span>
-                            <span className={cn('font-display font-bold text-sm', p.accentText)}>{p.name}</span>
-                          </div>
-                          <span className="font-mono font-bold text-xs text-white">
-                            {fmtK(p.priceMonthly)}<span className="text-[10px] text-text-dim font-normal">/mo</span>
-                          </span>
-                        </div>
-                        <p className="text-[11px] text-text-muted leading-tight line-clamp-1 group-hover:line-clamp-none transition-all">{p.tagline}</p>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Custom Request Panel */}
-            <div className="rounded-2xl border border-dashed border-accent/20 bg-accent/4 p-4 shrink-0">
-              <div className="flex items-center gap-2 mb-2">
-                <Wand2 className="w-3.5 h-3.5 text-accent" />
-                <h4 className="font-semibold text-white text-xs">Custom Request</h4>
-              </div>
-              <p className="text-[11px] text-text-dim mb-3 leading-relaxed">
-                Describe a custom requirement. We&apos;ll scope & price it on call.
-              </p>
-              <div className="flex gap-1.5">
-                <input
-                  value={customName}
-                  onChange={(e) => setCustomName(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && addCustom()}
-                  placeholder="e.g. Multi-region DR automation"
-                  className="flex-1 min-w-0 px-3 py-2 rounded-xl bg-white/5 border border-white/8 text-white placeholder:text-text-dim text-xs focus:outline-none focus:border-accent/40 focus:bg-white/8 transition-all"
-                />
-                <button
-                  onClick={addCustom}
-                  disabled={!customName.trim()}
-                  className="shrink-0 flex items-center justify-center w-8 h-8 rounded-xl bg-accent text-white hover:bg-accent-glow transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-                >
-                  <Plus className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
+        {/* ═══ SECTION 01: Compact Horizontal Base Tier Selector (On Top) ═══ */}
+        <div className={cn(
+          "rounded-2xl border border-white/10 bg-[#0a0a0f]/60 p-3 sm:p-3.5 mb-4 shrink-0 transition-all",
+          mobileTab === 'base' ? 'block' : 'hidden lg:block'
+        )}>
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="text-xs font-bold uppercase tracking-wider text-text-dim flex items-center gap-1.5">
+              <span className="text-accent font-mono">01</span> Choose Base Tier
+            </h2>
+            <span className="text-[11px] text-text-dim font-medium hidden sm:inline">
+              Selected: <strong className={cn("font-bold", plan.accentText)}>{plan.name}</strong> ({fmtK(plan.priceMonthly)}/mo)
+            </span>
           </div>
 
-          {/* ═══ COLUMN 2: Scrollable Add-On Catalog ═══ */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-3">
+            {basePlans.map((p) => {
+              const active = p.id === planId;
+              return (
+                <button
+                  key={p.id}
+                  onClick={() => setPlanId(p.id)}
+                  style={{ '--pg': p.glow } as React.CSSProperties}
+                  className={cn(
+                    'text-left rounded-xl border p-2.5 sm:p-3 transition-all duration-300 relative group overflow-hidden cursor-pointer',
+                    active
+                      ? 'bg-white/10 border-white/25 shadow-[0_0_24px_-10px_var(--pg)] ring-1 ring-white/20'
+                      : 'bg-white/3 border-white/8 hover:border-white/15 hover:bg-white/5'
+                  )}
+                >
+                  {/* Left accent color strip */}
+                  <div className={cn(
+                    'absolute left-0 top-0 bottom-0 w-1 transition-all',
+                    active ? p.accentText.replace('text-', 'bg-') : 'bg-transparent'
+                  )} />
+
+                  <div className="pl-1 sm:pl-1.5">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-0.5 sm:gap-1 mb-0.5">
+                      <div className="flex items-center gap-1.5 min-w-0">
+                        <span className="text-sm sm:text-base shrink-0">{p.icon}</span>
+                        <span className={cn('font-display font-bold text-xs sm:text-sm whitespace-nowrap', p.accentText)}>{p.name}</span>
+                      </div>
+                      <span className="font-mono font-bold text-[11px] sm:text-xs text-white shrink-0">
+                        {fmtK(p.priceMonthly)}<span className="text-[9px] sm:text-[10px] text-text-dim font-normal">/mo</span>
+                      </span>
+                    </div>
+                    <p className="text-[9px] sm:text-[11px] text-text-muted leading-tight line-clamp-1">{p.tagline}</p>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* ── 2-Column Dashboard Grid: 02 Add-On Services (Left Single Column) & 03 Live Config (Expanded Right) ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-[370px_1fr] xl:grid-cols-[390px_1fr] gap-4 items-stretch flex-1 min-h-0">
+
+          {/* ═══ COLUMN 1 (Section 02): Single-Column Scrollable Add-On Catalog & Custom Request ═══ */}
           <div className={cn(
             "lg:flex flex-col h-full min-h-0",
-            mobileTab === 'addons' ? 'flex' : 'hidden lg:flex'
+            mobileTab === 'addons' || mobileTab === 'base' ? 'flex' : 'hidden lg:flex'
           )}>
-            <div className="flex-1 rounded-2xl border border-white/10 bg-[#0a0a0f]/60 p-4 flex flex-col overflow-hidden min-h-0">
-              <div className="flex flex-col gap-3 mb-3 shrink-0">
+            <div className="flex-1 rounded-2xl border border-white/10 bg-[#0a0a0f]/60 p-3.5 sm:p-4 flex flex-col overflow-hidden min-h-0">
+              <div className="flex flex-col gap-2.5 mb-3 shrink-0">
                 <h2 className="text-xs font-bold uppercase tracking-wider text-text-dim flex items-center justify-between">
-                  <span>02 Add Add-On Services</span>
+                  <span className="flex items-center gap-1.5"><span className="text-accent font-mono">02</span> Add Add-On Services</span>
                   <span className="text-[10px] text-accent font-semibold">{filtered.length} found</span>
                 </h2>
 
                 {/* Search field */}
                 <div className="relative">
-                  <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-text-dim" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-text-dim" />
                   <input
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    placeholder="Search services (e.g. SOC2, FinOps, Alerting)..."
-                    className="w-full pl-9 pr-8 py-2 rounded-xl bg-white/5 border border-white/8 text-white placeholder:text-text-dim text-xs focus:outline-none focus:border-accent/40 focus:bg-white/8 transition-all"
+                    placeholder="Search services (e.g. SOC2, FinOps)..."
+                    className="w-full pl-8.5 pr-8 py-1.5 rounded-xl bg-white/5 border border-white/8 text-white placeholder:text-text-dim text-xs focus:outline-none focus:border-accent/40 focus:bg-white/8 transition-all"
                   />
                   {search && (
                     <button
                       onClick={() => setSearch('')}
-                      className="absolute right-2.5 top-1/2 -translate-y-1/2 w-5 h-5 rounded-lg bg-white/8 flex items-center justify-center text-text-dim hover:text-text"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 rounded-lg bg-white/8 flex items-center justify-center text-text-dim hover:text-text cursor-pointer"
                     >
-                      <X className="w-3 h-3" />
+                      <X className="w-2.5 h-2.5" />
                     </button>
                   )}
                 </div>
 
-                {/* Categories tab pills (flex-wrap of tiny pills) */}
+                {/* Categories tab pills */}
                 <div className="flex flex-wrap gap-1">
                   {categoryChips.map((c) => (
                     <button
                       key={c.id}
                       onClick={() => setActiveCat(c.id)}
                       className={cn(
-                        'px-2.5 py-1 rounded-full text-[10px] font-medium border transition-all',
+                        'px-2.5 py-0.5 rounded-full text-[10px] font-medium border transition-all cursor-pointer',
                         activeCat === c.id
                           ? 'bg-accent/15 border-accent/35 text-accent font-semibold'
                           : 'bg-white/3 border-white/5 text-text-dim hover:text-text hover:border-white/12'
@@ -900,15 +875,15 @@ export function PackageBuilder({
                 </div>
               </div>
 
-              {/* High-Density Add-on Service List */}
-              <div className="flex-1 overflow-y-auto pr-1 -mr-1" data-lenis-prevent>
+              {/* Single Column Scrollable Add-on Service List */}
+              <div className="flex-1 overflow-y-auto pr-1 -mr-1 space-y-2 min-h-0" data-lenis-prevent>
                 {filtered.length === 0 ? (
                   <div className="rounded-xl border border-white/5 bg-white/2 p-6 text-center">
                     <LayoutGrid className="w-6 h-6 text-text-dim mx-auto mb-2" />
                     <p className="text-text-muted text-xs">No matching services.</p>
                   </div>
                 ) : (
-                  <div className="grid sm:grid-cols-2 gap-2">
+                  <div className="flex flex-col gap-2">
                     {filtered.map((a) => {
                       const inCart = selectedIds.has(a.id);
                       const isBundled = isIncludedInPlan(a.id, planId);
@@ -928,7 +903,7 @@ export function PackageBuilder({
                             setDragOver(false);
                           }}
                           className={cn(
-                            'group flex flex-col justify-between rounded-xl border p-2.5 transition-all text-left relative cursor-grab active:cursor-grabbing select-none',
+                            'group flex items-center justify-between rounded-xl border p-2.5 transition-all text-left relative cursor-grab active:cursor-grabbing select-none',
                             isSameCategory
                               ? 'bg-accent/20 border-accent scale-102 shadow-[0_0_25px_rgba(168,85,247,0.5)] z-10'
                               : isDimmed
@@ -936,41 +911,45 @@ export function PackageBuilder({
                               : isBundled
                               ? 'bg-emerald-500/5 border-emerald-500/25'
                               : inCart
-                              ? 'bg-accent/5 border-accent/25'
-                              : 'bg-white/3 border-white/5 hover:border-white/12 hover:bg-white/5'
+                              ? 'bg-accent/10 border-accent/35 ring-1 ring-accent/30 shadow-[0_0_15px_rgba(56,189,248,0.15)]'
+                              : 'bg-white/3 border-white/6 hover:border-white/15 hover:bg-white/5'
                           )}
                         >
-                          <div className="flex items-start justify-between gap-1.5 mb-1.5">
-                            <div className="min-w-0 flex-1">
-                              <div className="flex items-center gap-1">
-                                <GripVertical className="w-3 h-3 text-text-dim/40 group-hover:text-accent shrink-0 transition-colors" />
-                                <h4 className="font-semibold text-white text-xs leading-snug truncate">{a.name}</h4>
-                              </div>
-                              <p className="text-[10px] text-text-dim line-clamp-2 mt-0.5 leading-snug pl-4">{a.desc}</p>
+                          <div className="min-w-0 flex-1 pr-2">
+                            <div className="flex items-center gap-1.5">
+                              <GripVertical className="w-3 h-3 text-text-dim/40 group-hover:text-accent shrink-0 transition-colors" />
+                              <h4 className="font-semibold text-white text-xs leading-tight truncate">{a.name}</h4>
+                              <span className="text-[9px] text-text-dim uppercase tracking-wider px-1.5 py-0.2 rounded bg-white/4 border border-white/6 shrink-0">
+                                {a.categoryLabel}
+                              </span>
                             </div>
+                            <p className="text-[10px] text-text-dim line-clamp-1 mt-0.5 leading-snug pl-4.5">{a.desc}</p>
+                          </div>
+
+                          <div className="flex items-center gap-2 shrink-0">
+                            {isBundled ? (
+                              <span className="font-mono font-bold text-[10px] text-emerald-400 uppercase tracking-wider">Included</span>
+                            ) : (
+                              <span className="font-mono font-bold text-xs text-white">
+                                {fmtK(a.price)}<span className="text-[9px] text-text-dim font-normal">/mo</span>
+                              </span>
+                            )}
+
                             <button
                               onClick={() => (isBundled ? undefined : inCart ? removeItem(a.id) : addOn(a))}
                               disabled={isBundled}
                               title={isBundled ? `Included in the ${plan.name} plan` : undefined}
                               className={cn(
-                                'shrink-0 w-6 h-6 rounded-lg flex items-center justify-center border transition-all',
+                                'shrink-0 w-6.5 h-6.5 rounded-lg flex items-center justify-center border transition-all cursor-pointer',
                                 isBundled
                                   ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40 cursor-default'
                                   : inCart
                                   ? 'bg-accent text-white border-accent hover:bg-red-500 hover:border-red-400'
-                                  : 'bg-white/5 border-white/10 text-text-dim hover:bg-accent/15 hover:border-accent/30 hover:text-accent'
+                                  : 'bg-white/5 border-white/10 text-text-dim hover:bg-accent/15 hover:border-accent/30 hover:text-white'
                               )}
                             >
                               {isBundled || inCart ? <Check className="w-3.5 h-3.5" /> : <Plus className="w-3.5 h-3.5" />}
                             </button>
-                          </div>
-                          <div className="flex items-center justify-between pt-1.5 border-t border-white/5 mt-auto pl-4">
-                            <span className="text-[9px] text-text-dim uppercase tracking-wider">{a.categoryLabel}</span>
-                            {isBundled ? (
-                              <span className="font-mono font-bold text-[10px] text-emerald-400 uppercase tracking-wider">Included</span>
-                            ) : (
-                              <span className="font-mono font-bold text-xs text-white">{fmtK(a.price)}<span className="text-[10px] text-text-dim font-normal">/mo</span></span>
-                            )}
                           </div>
                         </div>
                       );
@@ -978,10 +957,37 @@ export function PackageBuilder({
                   </div>
                 )}
               </div>
+
+              {/* Custom Request Panel */}
+              <div className="rounded-xl border border-dashed border-accent/25 bg-accent/5 p-3 shrink-0 mt-3">
+                <div className="flex items-center justify-between mb-1.5">
+                  <div className="flex items-center gap-1.5">
+                    <Wand2 className="w-3.5 h-3.5 text-accent" />
+                    <h4 className="font-semibold text-white text-xs">Custom Request</h4>
+                  </div>
+                  <span className="text-[10px] text-text-dim">Scope &amp; price on call</span>
+                </div>
+                <div className="flex gap-1.5">
+                  <input
+                    value={customName}
+                    onChange={(e) => setCustomName(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && addCustom()}
+                    placeholder="e.g. Multi-region DR automation, custom audit..."
+                    className="flex-1 min-w-0 px-3 py-1.5 rounded-lg bg-white/5 border border-white/8 text-white placeholder:text-text-dim text-xs focus:outline-none focus:border-accent/40 focus:bg-white/8 transition-all"
+                  />
+                  <button
+                    onClick={addCustom}
+                    disabled={!customName.trim()}
+                    className="shrink-0 flex items-center justify-center w-7 h-7 rounded-lg bg-accent text-white hover:bg-accent-glow transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* ═══ COLUMN 3: Live BOM & Request Panel ═══ */}
+          {/* ═══ COLUMN 2 (Section 03): Live BOM & Topology Panel ═══ */}
           <div className={cn(
             "lg:flex flex-col h-full min-h-0",
             mobileTab === 'package' ? 'flex' : 'hidden lg:flex'
@@ -1045,18 +1051,18 @@ export function PackageBuilder({
                 <div className="flex-1 flex flex-col min-h-0 mb-3" data-lenis-prevent>
                   <div
                     onClick={() => setIsMaximized(true)}
-                    className="relative w-full flex-1 rounded-xl border border-white/5 bg-black/40 overflow-hidden p-3 flex items-center justify-center transition-all duration-700 ease-out cursor-zoom-in group/canvas"
+                    className="relative w-full flex-1 min-h-[320px] lg:min-h-[360px] rounded-xl border border-white/5 bg-black/40 overflow-hidden p-3 flex items-center justify-center transition-all duration-700 ease-out cursor-zoom-in group/canvas"
                   >
                     {/* HUD background grid */}
                     <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff03_1px,transparent_1px),linear-gradient(to_bottom,#ffffff03_1px,transparent_1px)] bg-size-[16px_16px] pointer-events-none" />
                     
                     {/* Cost Savings Badge in Preview */}
-                    <div className="absolute top-2 left-2 z-20 flex items-center gap-1.5 px-2.5 py-1 rounded bg-emerald-500/10 border border-emerald-500/20 text-[9px] text-emerald-400 font-bold uppercase tracking-wider font-mono">
+                    <div className="absolute top-2.5 left-2.5 z-20 flex items-center gap-1.5 px-2.5 py-1 rounded bg-emerald-500/10 border border-emerald-500/20 text-[9px] text-emerald-400 font-bold uppercase tracking-wider font-mono shadow-xs">
                       Saving {fmtK(Math.round(monthlyTotal * 0.2 * 12))}/yr
                     </div>
 
                     {/* Expand workspace overlay hint */}
-                    <div className="absolute bottom-2 right-2 z-20 flex items-center gap-1.5 px-2 py-1 rounded bg-black/80 border border-white/10 text-[8px] text-text-dim opacity-0 group-hover/canvas:opacity-100 transition-opacity duration-300 pointer-events-none uppercase tracking-wider font-mono">
+                    <div className="absolute bottom-2.5 right-2.5 z-20 flex items-center gap-1.5 px-2.5 py-1 rounded bg-black/80 border border-white/10 text-[8px] text-text-dim opacity-0 group-hover/canvas:opacity-100 transition-opacity duration-300 pointer-events-none uppercase tracking-wider font-mono">
                       <Maximize2 className="w-2 h-2 text-accent" /> Click to Expand
                     </div>
                     
@@ -1064,7 +1070,8 @@ export function PackageBuilder({
                       ref={previewSvgRef}
                       onPointerMove={(e) => handleSVGPointerMove(e, false)}
                       viewBox={`0 0 600 ${maxNodeY}`}
-                      className="w-full h-auto relative z-10 overflow-visible"
+                      preserveAspectRatio="xMidYMid meet"
+                      className="w-full h-full relative z-10 overflow-visible mx-auto select-none"
                     >
                       <defs>
                         {/* Glow filters and style tag for path keyframe animations */}
@@ -1116,10 +1123,10 @@ export function PackageBuilder({
                           return (
                             <foreignObject
                               key={n.id}
-                              x={n.x - 95}
-                              y={n.y - 44}
-                              width={190}
-                              height={88}
+                              x={n.x - 70}
+                              y={n.y - 24}
+                              width={140}
+                              height={48}
                               className="overflow-visible"
                             >
                               <div
@@ -1130,18 +1137,20 @@ export function PackageBuilder({
                                 onPointerCancel={handlePointerUp}
                                 style={{
                                   borderColor: n.color,
-                                  boxShadow: hoveredNode === n.id ? `0 0 22px ${n.color}80` : `0 0 18px -2px ${n.color}60`,
+                                  boxShadow: hoveredNode === n.id ? `0 0 16px ${n.color}80` : `0 0 12px -2px ${n.color}60`,
                                   touchAction: 'none',
                                 }}
-                                className="w-full h-full rounded-2xl border-2 bg-neutral-950 flex flex-col items-center justify-center p-2.5 text-center transition-all duration-300 cursor-grab active:cursor-grabbing select-none touch-none"
+                                className="w-full h-full rounded-xl border bg-neutral-950 flex items-center justify-center gap-1.5 px-2 text-center transition-all duration-300 cursor-grab active:cursor-grabbing select-none touch-none"
                               >
-                                <span className="text-xl leading-none mb-1">{n.icon}</span>
-                                <span style={{ textShadow: `0 0 12px ${n.color}90` }} className="text-[14px] font-black uppercase tracking-widest text-white leading-none">
-                                  {n.label}
-                                </span>
-                                <span className="text-[10px] text-slate-400 mt-1 uppercase tracking-wider font-mono font-semibold">
-                                  Base Core
-                                </span>
+                                <span className="text-sm leading-none">{n.icon}</span>
+                                <div className="text-left leading-none">
+                                  <p style={{ textShadow: `0 0 8px ${n.color}90` }} className="text-[11px] font-black uppercase tracking-wider text-white">
+                                    {n.label}
+                                  </p>
+                                  <p className="text-[8px] text-slate-400 uppercase tracking-widest font-mono font-semibold mt-0.5">
+                                    Base Core
+                                  </p>
+                                </div>
                               </div>
                             </foreignObject>
                           );
@@ -1151,10 +1160,10 @@ export function PackageBuilder({
                           return (
                             <foreignObject
                               key={n.id}
-                              x={n.x - 95}
-                              y={n.y - 22}
-                              width={190}
-                              height={44}
+                              x={n.x - 65}
+                              y={n.y - 15}
+                              width={130}
+                              height={30}
                               className="overflow-visible"
                             >
                               <div
@@ -1165,15 +1174,15 @@ export function PackageBuilder({
                                 onPointerCancel={handlePointerUp}
                                 style={{
                                   borderColor: n.color,
-                                  boxShadow: hoveredNode === n.id ? `0 0 14px ${n.color}50` : `0 0 10px ${n.color}25`,
+                                  boxShadow: hoveredNode === n.id ? `0 0 10px ${n.color}50` : `0 0 6px ${n.color}25`,
                                   touchAction: 'none',
                                 }}
                                 className={cn(
-                                  "w-full h-full rounded-xl border-2 bg-neutral-950 flex items-center justify-center text-center px-2 cursor-grab active:cursor-grabbing select-none touch-none transition-all duration-300",
+                                  "w-full h-full rounded-lg border bg-neutral-950 flex items-center justify-center text-center px-2 cursor-grab active:cursor-grabbing select-none touch-none transition-all duration-300",
                                   isDimmed ? "opacity-30" : "opacity-100"
                                 )}
                               >
-                                <span style={{ textShadow: `0 0 10px ${n.color}70` }} className="text-[13px] font-extrabold text-white uppercase tracking-wide leading-tight text-center wrap-break-word">
+                                <span style={{ textShadow: `0 0 8px ${n.color}70` }} className="text-[10px] font-extrabold text-white uppercase tracking-wider leading-tight text-center truncate">
                                   {n.label}
                                 </span>
                               </div>
@@ -1185,10 +1194,10 @@ export function PackageBuilder({
                           return (
                             <foreignObject
                               key={n.id}
-                              x={n.x - 95}
-                              y={n.y - 22}
-                              width={190}
-                              height={44}
+                              x={n.x - 65}
+                              y={n.y - 15}
+                              width={130}
+                              height={30}
                               className="overflow-visible"
                             >
                               <div
@@ -1199,9 +1208,9 @@ export function PackageBuilder({
                                   borderColor: `${n.color}40`,
                                   touchAction: 'none',
                                 }}
-                                className="w-full h-full rounded-xl border-2 border-dashed bg-white/3 flex items-center justify-center text-center px-2 opacity-65 cursor-grab active:cursor-grabbing select-none touch-none"
+                                className="w-full h-full rounded-lg border border-dashed bg-white/3 flex items-center justify-center text-center px-2 opacity-65 cursor-grab active:cursor-grabbing select-none touch-none"
                               >
-                                <span className="text-[13px] font-bold text-slate-300 uppercase tracking-wide leading-tight text-center wrap-break-word">
+                                <span className="text-[10px] font-bold text-slate-300 uppercase tracking-wider leading-tight text-center truncate">
                                   {n.label}
                                 </span>
                               </div>
@@ -1213,10 +1222,10 @@ export function PackageBuilder({
                           return (
                             <foreignObject
                               key={n.id}
-                              x={n.x - 95}
-                              y={n.y - 34}
-                              width={190}
-                              height={68}
+                              x={n.x - 70}
+                              y={n.y - 18}
+                              width={140}
+                              height={36}
                               className="overflow-visible"
                             >
                               <div
@@ -1227,9 +1236,9 @@ export function PackageBuilder({
                                   borderColor: `${n.color}30`,
                                   touchAction: 'none',
                                 }}
-                                className="w-full h-full rounded-xl border border-dashed bg-white/2 flex items-center justify-center px-2.5 opacity-60 cursor-grab active:cursor-grabbing select-none touch-none"
+                                className="w-full h-full rounded-lg border border-dashed bg-white/2 flex items-center justify-center px-2 opacity-60 cursor-grab active:cursor-grabbing select-none touch-none"
                               >
-                                <span className="text-[12px] font-semibold text-slate-300 whitespace-normal wrap-break-word text-center line-clamp-2 leading-snug">
+                                <span className="text-[9px] font-semibold text-slate-300 text-center truncate leading-snug">
                                   {n.label}
                                 </span>
                               </div>
@@ -1240,10 +1249,10 @@ export function PackageBuilder({
                         return (
                           <foreignObject
                             key={n.id}
-                            x={n.x - 95}
-                            y={n.y - 34}
-                            width={190}
-                            height={68}
+                            x={n.x - 75}
+                            y={n.y - 20}
+                            width={150}
+                            height={40}
                             className="overflow-visible"
                           >
                             <div
@@ -1254,19 +1263,19 @@ export function PackageBuilder({
                               onPointerCancel={handlePointerUp}
                               style={{
                                 borderColor: n.color,
-                                boxShadow: hoveredNode === n.id ? `0 0 16px ${n.color}60` : `0 0 8px ${n.color}20`,
+                                boxShadow: hoveredNode === n.id ? `0 0 12px ${n.color}60` : `0 0 6px ${n.color}20`,
                                 touchAction: 'none',
                               }}
                               className={cn(
-                                "group/node w-full h-full rounded-xl border-2 bg-neutral-900 hover:bg-neutral-950 flex items-center justify-between px-2.5 relative shadow-lg cursor-grab active:cursor-grabbing select-none touch-none transition-all duration-300",
+                                "group/node w-full h-full rounded-lg border bg-neutral-900 hover:bg-neutral-950 flex items-center justify-between px-2 relative shadow-md cursor-grab active:cursor-grabbing select-none touch-none transition-all duration-300",
                                 isDimmed ? "opacity-30" : "opacity-100"
                               )}
                             >
                               <div className="min-w-0 flex-1 pr-1">
-                                <p style={{ textShadow: '0 1px 4px rgba(0,0,0,0.8)' }} className="text-[13px] font-bold text-white leading-snug whitespace-normal wrap-break-word line-clamp-2">
+                                <p style={{ textShadow: '0 1px 3px rgba(0,0,0,0.8)' }} className="text-[10px] font-bold text-white leading-tight truncate">
                                   {n.label}
                                 </p>
-                                <p className="text-[11px] text-slate-400 font-mono mt-0.5 leading-none font-semibold">
+                                <p className="text-[8px] text-slate-400 font-mono leading-none font-semibold mt-0.5">
                                   +{fmtK(n.price || 0)}/mo
                                 </p>
                               </div>
@@ -1276,9 +1285,9 @@ export function PackageBuilder({
                                   e.stopPropagation();
                                   if (n.originalId) removeItem(n.originalId);
                                 }}
-                                className="w-5.5 h-5.5 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400 hover:bg-red-500 hover:text-white transition-colors shrink-0"
+                                className="w-4 h-4 rounded bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400 hover:bg-red-500 hover:text-white transition-colors shrink-0 cursor-pointer"
                               >
-                                <X className="w-3 h-3" />
+                                <X className="w-2.5 h-2.5" />
                               </button>
                             </div>
                           </foreignObject>
@@ -1365,67 +1374,71 @@ export function PackageBuilder({
                 </>
               )}
 
-              {/* Price Calculation & Quote Request */}
-              <div className="border-t border-white/8 pt-3 mt-auto space-y-3 shrink-0">
-                <div className="space-y-1 text-xs">
+              {/* Price Calculation & Quote Request (Compact) */}
+              <div className="border-t border-white/8 pt-2.5 mt-auto space-y-2 shrink-0">
+                {/* 2-column compact breakdown */}
+                <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-[11px]">
                   <div className="flex justify-between text-text-dim">
-                    <span>Base Tier</span>
-                    <span>{fmtK(plan.priceMonthly)}/mo</span>
+                    <span>Base Tier:</span>
+                    <span className="font-mono text-white font-semibold">{fmtK(plan.priceMonthly)}/mo</span>
                   </div>
                   {includedItems.length > 0 && (
-                    <div className="flex justify-between text-emerald-400/80">
-                      <span>{plan.name} Services ({includedItems.length})</span>
+                    <div className="flex justify-between text-emerald-400/90 font-medium">
+                      <span>{plan.name} ({includedItems.length}):</span>
                       <span>Included</span>
                     </div>
                   )}
                   <div className="flex justify-between text-text-dim">
-                    <span>Add-ons ({extraItems.length})</span>
-                    <span>{extraItems.length > 0 ? `${fmtK(addOnsTotal)}/mo` : '—'}</span>
+                    <span>Add-ons ({extraItems.length}):</span>
+                    <span className="font-mono text-white">{extraItems.length > 0 ? `${fmtK(addOnsTotal)}/mo` : '—'}</span>
                   </div>
                   {customItems.length > 0 && (
-                    <div className="flex justify-between text-cyan">
-                      <span>Custom Requests ({customItems.length})</span>
+                    <div className="flex justify-between text-cyan font-medium">
+                      <span>Custom ({customItems.length}):</span>
                       <span>To be priced</span>
                     </div>
                   )}
                 </div>
 
-                <div className="h-px bg-white/5" />
-
-                <div className="flex items-baseline justify-between">
-                  <span className="text-xs font-semibold text-white">Est. Total</span>
-                  <div className="text-right">
-                    <span className="font-display font-black text-2xl text-white block leading-none">
-                      {fmtK(monthlyTotal)}<span className="text-text-dim text-xs font-normal">/mo</span>
+                {/* Est. Total in 1 concise row */}
+                <div className="flex items-center justify-between pt-1.5 border-t border-white/6">
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-xs font-bold text-white">Est. Total:</span>
+                    <span className="font-display font-black text-lg text-white leading-none font-mono">
+                      {fmtK(monthlyTotal)}<span className="text-text-dim text-[10px] font-normal">/mo</span>
                     </span>
-                    <p className="text-[10px] text-emerald-400 mt-1">Or {fmtK(annualMonthlyEquivalent)}/mo billed annually (-20%)</p>
                   </div>
+                  <span className="text-[10px] text-emerald-400 font-mono">
+                    Or {fmtK(annualMonthlyEquivalent)}/mo billed annually (-20%)
+                  </span>
                 </div>
 
+                {/* CTA button */}
                 {isSignedIn ? (
                   <Link href={ctaHref} className="block">
-                    <button className="w-full flex items-center justify-center gap-1.5 py-3 rounded-xl bg-linear-to-r from-accent to-purple-600 text-white font-bold text-xs hover:from-accent-glow hover:to-purple-500 shadow-[0_0_20px_-8px_rgba(168,85,247,0.5)] transition-all">
-                      Request Custom Package <ArrowRight className="w-3.5 h-3.5" />
+                    <button className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-linear-to-r from-accent to-purple-600 text-white font-bold text-xs hover:from-accent-glow hover:to-purple-500 shadow-md transition-all cursor-pointer">
+                      Review Cart &amp; Checkout <ArrowRight className="w-3.5 h-3.5" />
                     </button>
                   </Link>
                 ) : (
                   <button
                     onClick={() => setLeadModalOpen(true)}
-                    className="w-full flex items-center justify-center gap-1.5 py-3 rounded-xl bg-linear-to-r from-accent to-purple-600 text-white font-bold text-xs hover:from-accent-glow hover:to-purple-500 shadow-[0_0_20px_-8px_rgba(168,85,247,0.5)] transition-all"
+                    className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-linear-to-r from-accent to-purple-600 text-white font-bold text-xs hover:from-accent-glow hover:to-purple-500 shadow-md transition-all cursor-pointer"
                   >
                     Sign Up &amp; Request Quote <ArrowRight className="w-3.5 h-3.5" />
                   </button>
                 )}
 
-                {extras.length > 0 && (
-                  <button onClick={() => setExtras([])} className="w-full text-center text-[10px] text-text-dim hover:text-white transition-colors">
-                    Reset Builder
-                  </button>
-                )}
-
-                <div className="flex items-start gap-1.5 text-[9px] text-text-dim leading-relaxed bg-white/2 rounded-lg p-2 border border-white/5">
-                  <Info className="w-3 h-3 shrink-0 mt-px text-accent" />
-                  <span>indicative price. Confirmed after initial CoE scoping call.</span>
+                <div className="flex items-center justify-between text-[9px] text-text-dim pt-0.5">
+                  <div className="flex items-center gap-1">
+                    <Info className="w-2.5 h-2.5 text-accent shrink-0" />
+                    <span>Indicative price · Confirmed after scoping call</span>
+                  </div>
+                  {extras.length > 0 && (
+                    <button onClick={() => setExtras([])} className="text-text-dim hover:text-white transition-colors cursor-pointer">
+                      Reset Builder
+                    </button>
+                  )}
                 </div>
               </div>
             </div>

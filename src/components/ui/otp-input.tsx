@@ -95,22 +95,29 @@ export function useOtpInput({
   const [focusedIndex, setFocusedIndex] = useState(-1);
 
   const charsRef = useRef(chars);
-  charsRef.current = chars;
-
   const refs = useRef<(HTMLInputElement | null)[]>([]);
-
   const changed = useRef(onChange);
-  changed.current = onChange;
   const completed = useRef(onComplete);
-  completed.current = onComplete;
 
   useEffect(() => {
-    setChars((prev) =>
-      prev.length === length
-        ? prev
-        : Array.from({ length }, (_, i) => prev[i] ?? ""),
-    );
-    refs.current.length = length;
+    charsRef.current = chars;
+  }, [chars]);
+
+  useEffect(() => {
+    changed.current = onChange;
+    completed.current = onComplete;
+  }, [onChange, onComplete]);
+
+  useEffect(() => {
+    const id = requestAnimationFrame(() => {
+      setChars((prev) =>
+        prev.length === length
+          ? prev
+          : Array.from({ length }, (_, i) => prev[i] ?? ""),
+      );
+      refs.current.length = length;
+    });
+    return () => cancelAnimationFrame(id);
   }, [length]);
 
   const commit = useCallback((next: string[]) => {

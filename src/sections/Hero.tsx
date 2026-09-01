@@ -34,8 +34,8 @@ export function Hero() {
           </Link>
 
           <Link
-            href="/coe"
-            className="inline-flex items-center justify-center bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 text-white font-semibold px-7 py-3 rounded-full text-sm sm:text-base transition-all duration-200"
+            href="/contact"
+            className="inline-flex items-center justify-center bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 text-white font-semibold px-7 py-3 rounded-full text-sm sm:text-base hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 cursor-pointer"
           >
             Talk to an Architect
           </Link>

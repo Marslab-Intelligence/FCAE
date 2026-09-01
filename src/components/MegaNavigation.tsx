@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -66,9 +66,16 @@ export function MegaNavigation({ user }: { user: NavUser | null }) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
+  const [mobileOpenMenus, setMobileOpenMenus] = useState<Record<string, boolean>>({
+    Packages: false,
+    Services: false,
+    Solutions: false,
+  });
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const scrollProgress = useScrollProgress();
   const timeoutRef = useRef<ReturnType<typeof setTimeout>>(null);
+  const navRef = useRef<HTMLDivElement>(null);
+  const userNavRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
@@ -77,13 +84,76 @@ export function MegaNavigation({ user }: { user: NavUser | null }) {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const openMenu = (key: string) => {
-    if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    setActiveMenu(key);
-  };
+  const lastHoverTimeRef = useRef<number>(0);
 
-  const closeMenu = () => {
-    timeoutRef.current = setTimeout(() => setActiveMenu(null), 120);
+  const openMenu = useCallback((key: string) => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    lastHoverTimeRef.current = Date.now();
+    setActiveMenu(key);
+  }, []);
+
+  const handleButtonClick = useCallback((key: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    const now = Date.now();
+    const isRecentHover = now - lastHoverTimeRef.current < 400;
+
+    setActiveMenu((prev) => {
+      // If the menu was already open and this is a deliberate second click after 400ms, close it
+      if (prev === key && !isRecentHover) {
+        return null;
+      }
+      return key;
+    });
+  }, []);
+
+  const closeMenu = useCallback(() => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    timeoutRef.current = setTimeout(() => {
+      setActiveMenu(null);
+    }, 200);
+  }, []);
+
+  const cancelClose = useCallback(() => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+  }, []);
+
+  // Close dropdowns when clicking outside or pressing Escape
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent | TouchEvent) => {
+      const target = event.target as Node;
+      if (navRef.current && !navRef.current.contains(target)) {
+        setActiveMenu(null);
+      }
+      if (userNavRef.current && !userNavRef.current.contains(target)) {
+        setUserMenuOpen(false);
+      }
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setActiveMenu(null);
+        setUserMenuOpen(false);
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    window.addEventListener('pointerdown', handleClickOutside, true);
+    window.addEventListener('click', handleClickOutside, true);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('pointerdown', handleClickOutside, true);
+      window.removeEventListener('click', handleClickOutside, true);
+      window.removeEventListener('keydown', handleKeyDown);
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, []);
+
+  const toggleMobileMenu = (key: string) => {
+    setMobileOpenMenus((prev) => ({
+      ...prev,
+      [key]: !prev[key],
+    }));
   };
 
   return (
@@ -120,7 +190,10 @@ export function MegaNavigation({ user }: { user: NavUser | null }) {
           </Link>
 
           {/* Desktop Navigation — stellar-ai: links grouped into a floating glass pill */}
-          <div className="col-start-2 justify-self-center hidden lg:flex items-center gap-0.5 xl:gap-1 liquid-glass rounded-full px-1.5 xl:px-2 py-1.5">
+          <div
+            ref={navRef}
+            className="col-start-2 justify-self-center hidden lg:flex items-center gap-0.5 xl:gap-1 liquid-glass !overflow-visible rounded-full px-1.5 xl:px-2 py-1.5 relative z-50"
+          >
             {/* Mega Menu Triggers */}
             {Object.entries(megaMenus).map(([key, menu]) => (
               <div
@@ -130,14 +203,17 @@ export function MegaNavigation({ user }: { user: NavUser | null }) {
                 onMouseLeave={closeMenu}
               >
                 <button
+                  type="button"
+                  onClick={(e) => handleButtonClick(key, e)}
                   className={cn(
-                    'flex items-center gap-1.5 px-2.5 xl:px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors',
+                    'flex items-center gap-1.5 px-2.5 xl:px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors cursor-pointer',
                     activeMenu === key
                       ? 'bg-white/10 text-white'
                       : 'text-white/75 hover:bg-white/5 hover:text-white'
                   )}
                   aria-expanded={activeMenu === key}
                   aria-haspopup="true"
+                  aria-label={`${key} menu`}
                 >
                   {key}
                   <ChevronDown
@@ -152,16 +228,16 @@ export function MegaNavigation({ user }: { user: NavUser | null }) {
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: 8, scale: 0.97 }}
                       transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-                      className="liquid-glass absolute top-full left-1/2 -translate-x-1/2 mt-2 w-130 rounded-2xl bg-stellar-panel/95 shadow-[0_20px_60px_-12px_rgba(0,0,0,0.8)]"
-                      onMouseEnter={() => openMenu(key)}
+                      className="liquid-glass absolute top-full left-1/2 -translate-x-1/2 mt-2 w-[520px] rounded-2xl bg-stellar-panel/95 shadow-[0_20px_60px_-12px_rgba(0,0,0,0.8)] z-50 pointer-events-auto before:content-[''] before:absolute before:-top-3 before:left-0 before:right-0 before:h-3"
+                      onMouseEnter={cancelClose}
                       onMouseLeave={closeMenu}
                     >
-                      <div className="p-2 grid grid-cols-2 gap-1">
+                      <div className="p-2 grid grid-cols-2 gap-1 relative z-10">
                         {menu.items.map((item) => (
                           <Link
                             key={item.label}
                             href={item.href}
-                            className="flex items-start gap-3 p-3 rounded-xl hover:bg-white/6 transition-colors group"
+                            className="flex items-start gap-3 p-3 rounded-xl hover:bg-white/6 transition-colors group cursor-pointer"
                             onClick={() => setActiveMenu(null)}
                           >
                             {/* stellar-ai: neutral white-alpha icon tile, violet glyph */}
@@ -195,13 +271,24 @@ export function MegaNavigation({ user }: { user: NavUser | null }) {
           {/* Right side — CTA + User */}
           <div className="col-start-3 justify-self-end hidden lg:flex items-center gap-2 xl:gap-3 shrink-0">
             {user ? (
-              <div className="relative" onMouseEnter={() => setUserMenuOpen(true)} onMouseLeave={() => setUserMenuOpen(false)}>
-                <button className="flex items-center gap-2 px-2.5 py-2 rounded-xl text-sm font-medium text-white/70 hover:text-white hover:bg-white/5 transition-all">
+              <div
+                ref={userNavRef}
+                className="relative"
+                onMouseEnter={() => setUserMenuOpen(true)}
+                onMouseLeave={() => setUserMenuOpen(false)}
+              >
+                <button
+                  type="button"
+                  onClick={() => setUserMenuOpen((prev) => !prev)}
+                  className="flex items-center gap-2 px-2.5 py-2 rounded-xl text-sm font-medium text-white/70 hover:text-white hover:bg-white/5 transition-all cursor-pointer"
+                  aria-expanded={userMenuOpen}
+                  aria-haspopup="true"
+                >
                   <div className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center text-violet-200 text-xs font-semibold shrink-0">
                     {(user.name || user.email)[0].toUpperCase()}
                   </div>
                   <span className="max-w-24 xl:max-w-32 truncate whitespace-nowrap">{user.name || user.email.split('@')[0]}</span>
-                  <ChevronDown className={cn('w-3.5 h-3.5 transition-transform', userMenuOpen && 'rotate-180')} />
+                  <ChevronDown className={cn('w-3.5 h-3.5 transition-transform duration-200', userMenuOpen && 'rotate-180')} />
                 </button>
                 <AnimatePresence>
                   {userMenuOpen && (
@@ -209,21 +296,24 @@ export function MegaNavigation({ user }: { user: NavUser | null }) {
                       initial={{ opacity: 0, y: 6 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 6 }}
-                      className="liquid-glass absolute right-0 top-full mt-2 w-52 rounded-2xl bg-stellar-panel/95 shadow-2xl"
+                      transition={{ duration: 0.15 }}
+                      className="liquid-glass absolute right-0 top-full mt-2 w-52 rounded-2xl bg-stellar-panel/95 shadow-2xl z-50 pointer-events-auto before:content-[''] before:absolute before:-top-3 before:left-0 before:right-0 before:h-3"
+                      onMouseEnter={() => setUserMenuOpen(true)}
+                      onMouseLeave={() => setUserMenuOpen(false)}
                     >
-                      <div className="p-1">
-                        <Link href="/account" className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-white/70 hover:text-white hover:bg-white/5 transition-all">
+                      <div className="p-1 relative z-10">
+                        <Link href="/account" className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-white/70 hover:text-white hover:bg-white/5 transition-all" onClick={() => setUserMenuOpen(false)}>
                           <LayoutDashboard className="w-4 h-4" /> Dashboard
                         </Link>
-                        <Link href="/account/profile" className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-white/70 hover:text-white hover:bg-white/5 transition-all">
+                        <Link href="/account/profile" className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-white/70 hover:text-white hover:bg-white/5 transition-all" onClick={() => setUserMenuOpen(false)}>
                           <Settings className="w-4 h-4" /> Settings
                         </Link>
-                        <Link href="/account/notifications" className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-white/70 hover:text-white hover:bg-white/5 transition-all">
+                        <Link href="/account/notifications" className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-white/70 hover:text-white hover:bg-white/5 transition-all" onClick={() => setUserMenuOpen(false)}>
                           <Bell className="w-4 h-4" /> Notifications
                         </Link>
                         <div className="h-px bg-white/10 my-1" />
                         <form action="/api/auth/signout" method="post">
-                          <button className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-red-400 hover:bg-red-500/10 transition-all">
+                          <button type="submit" className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-red-400 hover:bg-red-500/10 transition-all cursor-pointer">
                             <LogOut className="w-4 h-4" /> Sign out
                           </button>
                         </form>
@@ -248,9 +338,11 @@ export function MegaNavigation({ user }: { user: NavUser | null }) {
 
           {/* Mobile Menu Button */}
           <button
-            className="col-start-3 justify-self-end lg:hidden p-2 rounded-xl bg-white/5 border border-white/10 text-text hover:bg-white/10 transition-all"
+            type="button"
+            className="col-start-3 justify-self-end lg:hidden p-2 rounded-xl bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-all cursor-pointer"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={isMobileMenuOpen}
           >
             {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
@@ -264,38 +356,75 @@ export function MegaNavigation({ user }: { user: NavUser | null }) {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
             className={cn(
               'fixed left-0 right-0 z-40 lg:hidden overflow-hidden bg-stellar-deep/98 backdrop-blur-2xl border-b border-white/10',
               isScrolled ? 'top-17' : 'top-16'
             )}
           >
-            <div className="px-6 py-6 space-y-2 max-h-[80vh] overflow-y-auto" data-lenis-prevent>
-              {Object.entries(megaMenus).map(([key, menu]) => (
-                <div key={key} className="space-y-1">
-                  <p className="stellar-eyebrow px-3 pt-4 pb-1">{key}</p>
-                  {menu.items.map((item) => (
-                    <Link
-                      key={item.label}
-                      href={item.href}
-                      className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-white/70 hover:text-white hover:bg-white/5 transition-all"
-                      onClick={() => setIsMobileMenuOpen(false)}
+            <div className="px-6 py-6 space-y-3 max-h-[80vh] overflow-y-auto" data-lenis-prevent>
+              {Object.entries(megaMenus).map(([key, menu]) => {
+                const isOpen = !!mobileOpenMenus[key];
+                return (
+                  <div key={key} className="space-y-1 rounded-2xl bg-white/[0.02] border border-white/[0.06] p-2">
+                    <button
+                      type="button"
+                      onClick={() => toggleMobileMenu(key)}
+                      className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium text-white hover:bg-white/5 transition-colors cursor-pointer"
+                      aria-expanded={isOpen}
                     >
-                      <item.icon className="w-4 h-4 text-violet-300 shrink-0" strokeWidth={1.5} />
-                      {item.label}
-                    </Link>
-                  ))}
-                </div>
-              ))}
-              {mainNavLinks.map((link) => (
-                <Link
-                  key={link.label}
-                  href={link.href}
-                  className="block px-3 py-2.5 rounded-xl text-sm text-white/70 hover:text-white hover:bg-white/5 transition-all"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  {link.label}
-                </Link>
-              ))}
+                      <span className="stellar-eyebrow !px-0 !py-0 text-white/90">{key}</span>
+                      <ChevronDown
+                        className={cn('w-4 h-4 text-white/60 transition-transform duration-200', isOpen && 'rotate-180')}
+                      />
+                    </button>
+                    <AnimatePresence>
+                      {isOpen && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: 'auto' }}
+                          exit={{ opacity: 0, height: 0 }}
+                          transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                          className="overflow-hidden"
+                        >
+                          <div className="pt-1 space-y-1">
+                            {menu.items.map((item) => (
+                              <Link
+                                key={item.label}
+                                href={item.href}
+                                className="flex items-start gap-3 px-3 py-2.5 rounded-xl text-sm text-white/70 hover:text-white hover:bg-white/5 transition-all"
+                                onClick={() => setIsMobileMenuOpen(false)}
+                              >
+                                <div className="w-7 h-7 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center shrink-0 mt-0.5">
+                                  <item.icon className="w-3.5 h-3.5 text-violet-300 shrink-0" strokeWidth={1.5} />
+                                </div>
+                                <div>
+                                  <p className="text-sm font-medium text-white/85">{item.label}</p>
+                                  <p className="text-xs text-white/45 leading-relaxed">{item.desc}</p>
+                                </div>
+                              </Link>
+                            ))}
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                );
+              })}
+
+              <div className="pt-2 space-y-1">
+                {mainNavLinks.map((link) => (
+                  <Link
+                    key={link.label}
+                    href={link.href}
+                    className="block px-3 py-2.5 rounded-xl text-sm font-medium text-white/75 hover:text-white hover:bg-white/5 transition-all"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </div>
+
               <div className="pt-4 border-t border-white/10 space-y-3">
                 <Link
                   href={user ? '/account' : '/sign-in'}

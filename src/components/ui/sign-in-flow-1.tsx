@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { sendOtpAction, verifyOtpAction } from "@/app/(auth)/otp-actions";
-import OtpInput, { type OtpStatus } from "@/components/ui/otp-input";
+import OtpInput from "@/components/ui/otp-input";
 
 function GoogleIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
@@ -440,30 +440,7 @@ export const SignInPage = ({ className, mode = "sign-up" }: SignInPageProps) => 
     setIsLoading(false);
   };
 
-  const handleCodeChange = (index: number, value: string) => {
-    if (value.length <= 1) {
-      const newCode = [...code];
-      newCode[index] = value;
-      setCode(newCode);
 
-      if (value && index < 5) {
-        codeInputRefs.current[index + 1]?.focus();
-      }
-
-      if (index === 5 && value) {
-        const isComplete = newCode.every(digit => digit.length === 1);
-        if (isComplete) {
-          verifyCode(newCode.join(""));
-        }
-      }
-    }
-  };
-
-  const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Backspace" && !code[index] && index > 0) {
-      codeInputRefs.current[index - 1]?.focus();
-    }
-  };
 
   const handleBackClick = () => {
     setStep("email");

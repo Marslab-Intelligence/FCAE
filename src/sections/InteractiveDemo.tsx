@@ -1,13 +1,11 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { cn } from '@/lib/utils';
-import { useReveal } from '@/hooks/useGSAP';
-import { DURATION_REVEAL, STAGGER_UNIT } from '@/lib/motion';
-import { HelpCircle, ChevronRight, MessageSquare, Sparkles } from 'lucide-react';
+import { HelpCircle } from 'lucide-react';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -71,6 +69,92 @@ const qnaList = [
   },
 ];
 
+/**
+ * Presentational-only grouping of qnaList into the governance tiers the
+ * content itself already runs through (routine ops → named owners →
+ * scheduled business reviews → leadership escalation). `count` tracks
+ * how many consecutive qnaList entries, in existing array order, belong
+ * to each tier — the array itself is never reordered.
+ */
+const tiers = [
+  { name: 'Operational', tagline: 'Recurring & routine', color: '#22d3ee', count: 3 },
+  { name: 'Tactical', tagline: 'Named point of contact', color: '#818cf8', count: 3 },
+  { name: 'Strategic', tagline: 'Scheduled, quarterly cadence', color: '#a78bfa', count: 3 },
+  { name: 'Executive', tagline: 'Direct, as-needed access', color: '#fbbf24', count: 2 },
+] as const;
+
+const tierBoundaries = tiers.reduce<number[]>((acc, t, i) => {
+  acc.push((acc[i - 1] ?? 0) + t.count);
+  return acc;
+}, []);
+
+function tierIndexFor(qnaIndex: number) {
+  return tierBoundaries.findIndex(boundary => qnaIndex < boundary);
+}
+
+const spineGradient = `linear-gradient(180deg, ${tiers
+  .map((t, i) => {
+    const start = ((tierBoundaries[i - 1] ?? 0) / qnaList.length) * 100;
+    const end = (tierBoundaries[i] / qnaList.length) * 100;
+    return `${t.color} ${start.toFixed(1)}%, ${t.color} ${end.toFixed(1)}%`;
+  })
+  .join(', ')})`;
+
+function TierMeter({ level, color }: { level: number; color: string }) {
+  return (
+    <span className="inline-flex items-end gap-[2px]" aria-hidden="true">
+      {[0, 1, 2, 3].map(i => (
+        <span
+          key={i}
+          className="w-[3px] rounded-full transition-colors duration-300"
+          style={{
+            height: `${5 + i * 3}px`,
+            background: i < level ? color : 'rgba(255,255,255,0.14)',
+          }}
+        />
+      ))}
+    </span>
+  );
+}
+
+function DetailReadout({
+  item,
+  tier,
+}: {
+  item: (typeof qnaList)[number];
+  tier: (typeof tiers)[number];
+}) {
+  return (
+    <div
+      className="relative rounded-2xl rounded-l-md border border-white/10 bg-white/[0.03] p-4 sm:p-6 lg:p-7"
+      style={{ borderLeft: `3px solid ${tier.color}` }}
+    >
+      <div className="flex items-center gap-2 mb-3 sm:mb-4">
+        <span
+          className="w-1.5 h-1.5 rounded-full shrink-0"
+          style={{ background: tier.color, boxShadow: `0 0 8px ${tier.color}` }}
+        />
+        <span className="text-[11px] sm:text-xs font-medium tracking-normal" style={{ color: tier.color }}>
+          {tier.name} activity
+        </span>
+      </div>
+
+      <h3 className="text-lg sm:text-2xl lg:text-3xl font-display font-semibold text-white mb-3 sm:mb-4">
+        {item.activity}
+      </h3>
+
+      <div className="pl-3 border-l border-white/15 mb-3 sm:mb-4">
+        <span className="text-[10px] sm:text-xs text-white/40">Answers</span>
+        <p className="text-sm sm:text-base lg:text-lg font-medium mt-0.5" style={{ color: tier.color }}>
+          {item.question}
+        </p>
+      </div>
+
+      <p className="text-white/65 text-xs sm:text-sm lg:text-base leading-relaxed">{item.description}</p>
+    </div>
+  );
+}
+
 export function InteractiveDemo() {
   const sectionRef = useRef<HTMLElement | null>(null);
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -99,14 +183,9 @@ export function InteractiveDemo() {
     return () => ctx.revert();
   }, []);
 
-  useReveal('#qna .reveal-row', {
-    y: 16,
-    duration: DURATION_REVEAL,
-    stagger: STAGGER_UNIT,
-    ease: 'power3.out',
-  });
-
   const activeItem = qnaList[selectedIndex];
+  const activeTierIndex = useMemo(() => tierIndexFor(selectedIndex), [selectedIndex]);
+  const activeTier = tiers[activeTierIndex];
 
   return (
     <section
@@ -116,11 +195,11 @@ export function InteractiveDemo() {
       aria-labelledby="qna-heading"
     >
       <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
-        <div className="absolute top-1/3 right-1/4 w-150 h-150 rounded-full bg-linear-to-r from-accent/10 via-transparent to-purple-600/10 blur-3xl" />
+        <div className="absolute top-1/3 right-1/4 w-150 h-150 rounded-full bg-linear-to-br from-cyan-500/8 via-transparent to-amber-500/8 blur-3xl" />
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-6">
-        <div className="text-center mb-12">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="text-center mb-8 sm:mb-12">
           <motion.span
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -141,58 +220,110 @@ export function InteractiveDemo() {
           </p>
         </div>
 
-        {/* Q&A Interactive Accordion / Selector */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* Question List */}
-          <div className="lg:col-span-5 space-y-2 max-h-125 overflow-y-auto pr-2 custom-scrollbar" data-lenis-prevent>
-            {qnaList.map((item, idx) => (
-              <button
-                key={item.question}
-                onClick={() => setSelectedIndex(idx)}
-                className={cn(
-                  'reveal-row w-full text-left p-4 rounded-2xl border transition-all duration-300 flex items-center justify-between gap-4',
-                  selectedIndex === idx
-                    ? 'bg-accent/15 border-accent text-white shadow-[0_0_20px_rgba(168,85,247,0.3)]'
-                    : 'bg-white/5 border-white/10 text-white/55 hover:bg-white/10 hover:text-white'
-                )}
-              >
-                <div className="flex items-center gap-3">
-                  <MessageSquare className={cn('w-4 h-4 shrink-0', selectedIndex === idx ? 'text-accent' : 'text-white/45')} />
-                  <span className="text-sm font-medium leading-snug">{item.question}</span>
-                </div>
-                <ChevronRight className={cn('w-4 h-4 shrink-0 transition-transform', selectedIndex === idx && 'translate-x-1 text-accent')} />
-              </button>
-            ))}
+        {/* Escalation spine: the 11 questions grouped into the governance tiers
+            the underlying activities already run through — routine ops at the
+            bottom of the chain, leadership escalation at the top. */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-start">
+          <div className="lg:col-span-5">
+            <ol className="relative">
+              <div className="absolute left-3 top-1 bottom-1 w-px overflow-hidden" aria-hidden="true">
+                <motion.div
+                  className="w-full h-full origin-top"
+                  style={{ background: spineGradient, opacity: 0.4 }}
+                  initial={{ scaleY: 0 }}
+                  whileInView={{ scaleY: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 1.1, ease: [0.16, 1, 0.3, 1] }}
+                />
+              </div>
+
+              {tiers.map((tier, tIdx) => {
+                const startIndex = tierBoundaries[tIdx - 1] ?? 0;
+                const items = qnaList.slice(startIndex, tierBoundaries[tIdx]);
+
+                return (
+                  <li key={tier.name} className="mb-6 last:mb-0">
+                    <div className="relative flex items-center gap-2.5 pl-[26px] mb-2">
+                      <TierMeter level={tIdx + 1} color={tier.color} />
+                      <span
+                        className="font-display text-[13px] sm:text-sm font-semibold"
+                        style={{ color: tier.color }}
+                      >
+                        {tier.name}
+                      </span>
+                      <span className="text-[11px] sm:text-xs text-white/35">· {tier.tagline}</span>
+                    </div>
+
+                    <div className="space-y-1">
+                      {items.map((item, localIdx) => {
+                        const idx = startIndex + localIdx;
+                        const active = idx === selectedIndex;
+                        return (
+                          <div key={item.question}>
+                            <button
+                              onClick={() => setSelectedIndex(idx)}
+                              aria-current={active}
+                              className="relative w-full text-left pl-[26px] pr-2 py-2 rounded-md transition-colors duration-200"
+                            >
+                              <span
+                                className="absolute left-3 top-1/2 -translate-y-1/2 -translate-x-1/2 rounded-full transition-all duration-300"
+                                style={{
+                                  width: active ? 9 : 6,
+                                  height: active ? 9 : 6,
+                                  background: active ? tier.color : 'rgba(255,255,255,0.25)',
+                                  boxShadow: active ? `0 0 10px ${tier.color}` : 'none',
+                                }}
+                                aria-hidden="true"
+                              />
+                              <span
+                                className={cn(
+                                  'text-[13px] sm:text-sm font-medium leading-snug transition-colors duration-200',
+                                  active ? 'text-white' : 'text-white/55 hover:text-white/85'
+                                )}
+                              >
+                                {item.question}
+                              </span>
+                            </button>
+
+                            {/* Mobile/tablet: detail expands inline, right under the active question */}
+                            <div className="lg:hidden">
+                              <AnimatePresence initial={false}>
+                                {active && (
+                                  <motion.div
+                                    initial={{ height: 0, opacity: 0 }}
+                                    animate={{ height: 'auto', opacity: 1 }}
+                                    exit={{ height: 0, opacity: 0 }}
+                                    transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+                                    className="overflow-hidden"
+                                  >
+                                    <div className="pl-[26px] pt-2 pb-1 pr-1">
+                                      <DetailReadout item={item} tier={tier} />
+                                    </div>
+                                  </motion.div>
+                                )}
+                              </AnimatePresence>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </li>
+                );
+              })}
+            </ol>
           </div>
 
-          {/* Active Detail Showcase Card */}
-          <div className="lg:col-span-7">
+          {/* Desktop: sticky readout beside the spine */}
+          <div className="hidden lg:block lg:col-span-7 lg:sticky lg:top-24">
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeItem.activity}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.3 }}
-                className="p-8 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-xl shadow-2xl relative overflow-hidden"
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.25 }}
               >
-                <div className="absolute top-0 right-0 w-48 h-48 bg-linear-to-bl from-accent/20 via-transparent to-transparent pointer-events-none rounded-bl-full" />
-
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-accent/20 border border-accent/30 text-accent text-xs font-semibold uppercase tracking-wider mb-6">
-                  <Sparkles className="w-3.5 h-3.5" /> Corresponding SID Activity
-                </div>
-
-                <h3 className="text-xl sm:text-2xl lg:text-3xl font-display font-semibold text-white mb-4">{activeItem.activity}</h3>
-
-                <div className="p-4 rounded-2xl bg-white/5 border border-white/10 mb-6">
-                  <span className="text-xs font-semibold text-white/45 uppercase tracking-wider block mb-1">Primary Question Answered</span>
-                  <p className="text-lg font-medium text-accent italic">{activeItem.question}</p>
-                </div>
-
-                <div className="space-y-2">
-                  <span className="text-xs font-semibold text-white/45 uppercase tracking-wider block">Short Description</span>
-                  <p className="text-white/55 text-base leading-relaxed">{activeItem.description}</p>
-                </div>
+                <DetailReadout item={activeItem} tier={activeTier} />
               </motion.div>
             </AnimatePresence>
           </div>

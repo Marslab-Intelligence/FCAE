@@ -6,11 +6,10 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { useDashboardTheme } from '@/components/DashboardThemeProvider';
 import {
   Server, Activity, ShieldCheck, Cpu, HardDrive,
   Settings, CreditCard, HelpCircle, FileText, LogOut,
-  Menu, X, Palette, Check, ChevronRight, type LucideIcon
+  Menu, X, ChevronRight, type LucideIcon
 } from 'lucide-react';
 
 const navGroups = [
@@ -73,50 +72,6 @@ function NavItem({
   );
 }
 
-function ThemeQuickToggle() {
-  const { theme, setTheme, options, currentOption } = useDashboardTheme();
-  const [open, setOpen] = useState(false);
-
-  return (
-    <div className="relative">
-      <button
-        onClick={() => setOpen(!open)}
-        type="button"
-        className="flex items-center justify-between w-full rounded-lg px-3 py-2 text-xs font-medium text-text-muted hover:text-text hover:bg-bg-slate/60 border border-transparent transition-all cursor-pointer"
-      >
-        <div className="flex items-center gap-2.5">
-          <Palette className="w-4 h-4 text-accent shrink-0" />
-          <span>Theme: <strong className="text-accent capitalize">{currentOption?.name || (theme === 'arctic' ? 'Pharaonic Gold' : 'Half White')}</strong></span>
-        </div>
-        <ChevronRight className={cn('w-3.5 h-3.5 text-text-dim transition-transform duration-200', open && 'rotate-90')} />
-      </button>
-
-      {open && (
-        <div className="absolute left-0 bottom-full mb-2 w-full p-1.5 rounded-xl bg-bg-card border border-border shadow-2xl z-50 space-y-1">
-          {options.map((t) => (
-            <button
-              key={t.id}
-              onClick={() => {
-                setTheme(t.id);
-                setOpen(false);
-              }}
-              className={cn(
-                "flex items-center justify-between w-full px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer",
-                theme === t.id ? "bg-accent/15 text-accent font-semibold" : "text-text-muted hover:text-text hover:bg-bg-slate/60"
-              )}
-            >
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full border border-black/20" style={{ backgroundColor: t.accentHex }} />
-                <span>{t.name}</span>
-              </div>
-              {theme === t.id && <Check className="w-3.5 h-3.5 text-accent" />}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
 
 function SidebarInnerContent({
   user: _user,
@@ -195,9 +150,8 @@ function SidebarInnerContent({
           </Link>
         </div>
 
-        {/* Theme Toggle & Sign Out */}
+        {/* Sign Out */}
         <div className="pt-2 border-t border-border space-y-1">
-          <ThemeQuickToggle />
           <form action={signOutAction}>
             <button
               type="submit"

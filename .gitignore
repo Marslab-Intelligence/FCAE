@@ -30,3 +30,4 @@ next-env.d.ts
 /tests/visual/__out/
 /playwright-report/
 /blob-report/
+*.png

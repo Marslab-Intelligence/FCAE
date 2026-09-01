@@ -17,11 +17,11 @@ export interface ThemeOption {
 export const THEME_OPTIONS: ThemeOption[] = [
   {
     id: 'arctic',
-    name: 'Pharaonic Gold',
-    description: 'Deep golden olive obsidian with hieroglyphic aura',
-    bgHex: '#111009',
-    accentHex: '#eab308',
-    secondaryHex: '#fde047',
+    name: 'Electric Cyan & Obsidian Black',
+    description: 'Pitch obsidian black with glowing electric cyan blue aura',
+    bgHex: '#030712',
+    accentHex: '#38bdf8',
+    secondaryHex: '#7dd3fc',
   },
   {
     id: 'frost',
