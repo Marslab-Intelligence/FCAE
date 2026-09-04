@@ -18,6 +18,8 @@ const nextConfig = {
     ],
   },
 
+  serverExternalPackages: ['@electric-sql/pglite', 'postgres'],
+
   experimental: {
     optimizePackageImports: [
       'framer-motion',

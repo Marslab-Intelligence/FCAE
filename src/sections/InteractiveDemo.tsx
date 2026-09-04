@@ -102,11 +102,11 @@ const spineGradient = `linear-gradient(180deg, ${tiers
 
 function TierMeter({ level, color }: { level: number; color: string }) {
   return (
-    <span className="inline-flex items-end gap-[2px]" aria-hidden="true">
+    <span className="inline-flex items-end gap-0.5" aria-hidden="true">
       {[0, 1, 2, 3].map(i => (
         <span
           key={i}
-          className="w-[3px] rounded-full transition-colors duration-300"
+          className="w-0.75 rounded-full transition-colors duration-300"
           style={{
             height: `${5 + i * 3}px`,
             background: i < level ? color : 'rgba(255,255,255,0.14)',
@@ -126,7 +126,7 @@ function DetailReadout({
 }) {
   return (
     <div
-      className="relative rounded-2xl rounded-l-md border border-white/10 bg-white/[0.03] p-4 sm:p-6 lg:p-7"
+      className="relative rounded-2xl rounded-l-md border border-white/10 bg-white/3 p-4 sm:p-6 lg:p-7"
       style={{ borderLeft: `3px solid ${tier.color}` }}
     >
       <div className="flex items-center gap-2 mb-3 sm:mb-4">
@@ -243,7 +243,7 @@ export function InteractiveDemo() {
 
                 return (
                   <li key={tier.name} className="mb-6 last:mb-0">
-                    <div className="relative flex items-center gap-2.5 pl-[26px] mb-2">
+                    <div className="relative flex items-center gap-2.5 pl-6.5 mb-2">
                       <TierMeter level={tIdx + 1} color={tier.color} />
                       <span
                         className="font-display text-[13px] sm:text-sm font-semibold"
@@ -263,7 +263,7 @@ export function InteractiveDemo() {
                             <button
                               onClick={() => setSelectedIndex(idx)}
                               aria-current={active}
-                              className="relative w-full text-left pl-[26px] pr-2 py-2 rounded-md transition-colors duration-200"
+                              className="relative w-full text-left pl-6.5 pr-2 py-2 rounded-md transition-colors duration-200"
                             >
                               <span
                                 className="absolute left-3 top-1/2 -translate-y-1/2 -translate-x-1/2 rounded-full transition-all duration-300"
@@ -296,7 +296,7 @@ export function InteractiveDemo() {
                                     transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
                                     className="overflow-hidden"
                                   >
-                                    <div className="pl-[26px] pt-2 pb-1 pr-1">
+                                    <div className="pl-6.5 pt-2 pb-1 pr-1">
                                       <DetailReadout item={item} tier={tier} />
                                     </div>
                                   </motion.div>

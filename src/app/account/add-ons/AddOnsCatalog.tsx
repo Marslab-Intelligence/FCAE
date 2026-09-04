@@ -535,9 +535,9 @@ export function AddOnsCatalog({ planId: initialPlanId }: { planId: PlanId | null
 
       {/* ── Main Interactive Section ── */}
       {viewMode === 'split' ? (
-        <div className="grid grid-cols-1 lg:grid-cols-[1.35fr_1.15fr] gap-5 items-stretch min-h-[620px]">
+        <div className="grid grid-cols-1 lg:grid-cols-[1.35fr_1.15fr] gap-5 items-stretch min-h-155">
           {/* ═══ COLUMN 1: Add-On Services Catalog ═══ */}
-          <div className="rounded-2xl border border-white/10 bg-[#080d1a]/80 backdrop-blur-xl p-4 flex flex-col overflow-hidden min-h-[580px]">
+          <div className="rounded-2xl border border-white/10 bg-[#080d1a]/80 backdrop-blur-xl p-4 flex flex-col overflow-hidden min-h-145">
             <div className="flex items-center justify-between mb-3 shrink-0">
               <h2 className="text-xs font-bold uppercase tracking-wider text-text-dim flex items-center gap-1.5">
                 <span className="text-accent font-mono">01</span> Add-On Services Catalog
@@ -628,7 +628,7 @@ export function AddOnsCatalog({ planId: initialPlanId }: { planId: PlanId | null
           </div>
 
           {/* ═══ COLUMN 2: Interactive Topology Architecture Tree ═══ */}
-          <div className="rounded-2xl border border-white/10 bg-[#080d1a]/80 backdrop-blur-xl p-4 flex flex-col overflow-hidden min-h-[580px]">
+          <div className="rounded-2xl border border-white/10 bg-[#080d1a]/80 backdrop-blur-xl p-4 flex flex-col overflow-hidden min-h-145">
             <div className="flex items-center justify-between mb-3 shrink-0">
               <h2 className="text-xs font-bold uppercase tracking-wider text-text-dim flex items-center gap-1.5">
                 <span className="text-accent font-mono">02</span> Live Architecture Topology Tree
@@ -653,7 +653,7 @@ export function AddOnsCatalog({ planId: initialPlanId }: { planId: PlanId | null
               }}
               onDrop={handleDrop}
               className={cn(
-                'flex-1 rounded-xl border bg-black/50 overflow-hidden relative p-2 flex items-center justify-center transition-all duration-300 min-h-[250px] sm:min-h-[280px] max-h-[320px] cursor-zoom-in group/canvas',
+                'flex-1 rounded-xl border bg-black/50 overflow-hidden relative p-2 flex items-center justify-center transition-all duration-300 min-h-62.5 sm:min-h-70 max-h-80 cursor-zoom-in group/canvas',
                 dragOver ? 'border-accent shadow-[0_0_30px_-5px_rgba(56,189,248,0.4)]' : 'border-white/5'
               )}
               onClick={(e) => {
@@ -681,7 +681,7 @@ export function AddOnsCatalog({ planId: initialPlanId }: { planId: PlanId | null
                 onPointerMove={(e) => handleSVGPointerMove(e, false)}
                 viewBox={`0 0 600 ${maxNodeY}`}
                 preserveAspectRatio="xMidYMid meet"
-                className="w-full h-full max-h-[240px] sm:max-h-[270px] relative z-10 overflow-visible mx-auto select-none"
+                className="w-full h-full max-h-60 sm:max-h-67.5 relative z-10 overflow-visible mx-auto select-none"
               >
                 <defs>
                   <style>{`

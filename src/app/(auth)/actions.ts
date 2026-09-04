@@ -2,11 +2,13 @@
 
 import { eq } from 'drizzle-orm';
 import { redirect } from 'next/navigation';
+import { after } from 'next/server';
 import { z } from 'zod';
 import { db } from '@/db/client';
 import { users } from '@/db/schema';
 import { createSession, hashPassword, verifyPassword, setSessionCookie, clearSessionCookie } from '@/lib/auth';
 import { adoptPendingPlan } from '@/lib/pending-plan';
+import { pushSignupToCrm } from '@/lib/crm';
 
 const credentialsSchema = z.object({
   email: z.string().email('Enter a valid email address'),
@@ -34,6 +36,8 @@ export async function signUpAction(_prevState: AuthActionState, formData: FormDa
 
   const hashedPassword = await hashPassword(password);
   const [user] = await db.insert(users).values({ email, hashedPassword }).returning();
+
+  after(() => pushSignupToCrm({ name: user.name, email: user.email }, 'PASSWORD'));
 
   await adoptPendingPlan(user.id);
     const sessionId = await createSession(user.id);

@@ -10,11 +10,66 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { LeadCaptureModal } from '@/components/LeadCaptureModal';
+import { GuidedTour, TourLauncherButton, type GuidedTourHandle, type TourStep } from '@/components/GuidedTour';
 import {
   basePlans, getPlan, addOnCategories, allAddOns,
   includedAddOnsForPlan, isIncludedInPlan, type PlanId, type AddOn,
 } from '@/lib/package-catalog';
 import { useCurrency } from '@/components/CurrencyProvider';
+
+const configuratorTourSteps: TourStep[] = [
+  {
+    targetSelector: 'tier-cards',
+    title: 'Choose your base tier',
+    description:
+      'Start by choosing a base tier. Each tier includes a different set of core services — Foundation is our entry-level plan.',
+    placement: 'bottom',
+  },
+  {
+    targetSelector: 'selected-tier',
+    title: 'Your selection, at a glance',
+    description: 'Your selected tier and its monthly price update here as you choose.',
+    placement: 'bottom',
+  },
+  {
+    targetSelector: 'addon-search',
+    title: 'Find add-on services',
+    description:
+      'Search or filter add-on services by category — Foundation, Care, Assure, or Elite — to build out your package.',
+    placement: 'right',
+  },
+  {
+    targetSelector: 'addon-add-button',
+    title: 'Add optional services',
+    description:
+      "Click + to add an optional service. Included services show a green checkmark and can't be removed.",
+    placement: 'left',
+  },
+  {
+    targetSelector: 'live-config',
+    title: 'Watch your package take shape',
+    description:
+      'Watch your package take shape here in real time — this diagram updates instantly as you add or remove services.',
+    placement: 'left',
+  },
+  {
+    targetSelector: 'checkout',
+    title: 'Request your quote',
+    description:
+      "Your estimated monthly cost updates live. When you're happy with your package, click here to request a quote.",
+    placement: 'top',
+  },
+];
+
+const catalogWorkspaceTourSteps: TourStep[] = [
+  {
+    targetSelector: 'max-addon-catalog',
+    title: 'Drag services onto the canvas',
+    description:
+      'Grab any add-on card from this catalog and drop it onto the topology canvas to add it to your package instantly.',
+    placement: 'right',
+  },
+];
 
 interface SelectedItem {
   id: string;
@@ -211,6 +266,8 @@ export function PackageBuilder({
   }, []);
 
   const dropRef = useRef<HTMLDivElement>(null);
+  const tourRef = useRef<GuidedTourHandle>(null);
+  const catalogTourRef = useRef<GuidedTourHandle>(null);
   const plan = getPlan(planId);
 
   // ── Restore saved builder state, then mark hydrated ──
@@ -281,6 +338,13 @@ export function PackageBuilder({
       return matchCat && matchQ;
     });
   }, [search, activeCat]);
+
+  // First non-bundled, non-selected row in the visible list — the guided
+  // tour anchors its "+" step here since it always exists on first visit.
+  const firstAddableAddOnId = useMemo(
+    () => filtered.find((a) => !isIncludedInPlan(a.id, planId))?.id,
+    [filtered, planId]
+  );
 
   const addOn = (a: { id: string; name: string; price: number; categoryLabel: string }) => {
     if (isIncludedInPlan(a.id, planId)) return; // already bundled with the tier
@@ -720,8 +784,11 @@ export function PackageBuilder({
         {/* Compact Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 shrink-0">
           <div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent/10 border border-accent/20 text-xs font-semibold text-accent mb-2">
-              <Package className="w-3.5 h-3.5" /> CoE Cloud Configurator
+            <div className="flex items-center gap-3 mb-2">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent/10 border border-accent/20 text-xs font-semibold text-accent">
+                <Package className="w-3.5 h-3.5" /> CoE Cloud Configurator
+              </div>
+              <TourLauncherButton onClick={() => tourRef.current?.start()} />
             </div>
             <h1 className="font-display font-bold text-2xl sm:text-3xl tracking-tight text-white leading-tight">
               Architect Your <span className="bg-linear-to-r from-accent via-purple-400 to-cyan bg-clip-text text-transparent">Managed Package</span>
@@ -778,12 +845,12 @@ export function PackageBuilder({
             <h2 className="text-xs font-bold uppercase tracking-wider text-text-dim flex items-center gap-1.5">
               <span className="text-accent font-mono">01</span> Choose Base Tier
             </h2>
-            <span className="text-[11px] text-text-dim font-medium hidden sm:inline">
+            <span data-tour-id="selected-tier" className="text-[11px] text-text-dim font-medium hidden sm:inline">
               Selected: <strong className={cn("font-bold", plan.accentText)}>{plan.name}</strong> ({fmtK(plan.priceMonthly)}/mo)
             </span>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-3">
+          <div data-tour-id="tier-cards" className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-3">
             {basePlans.map((p) => {
               const active = p.id === planId;
               return (
@@ -838,7 +905,7 @@ export function PackageBuilder({
                 </h2>
 
                 {/* Search field */}
-                <div className="relative">
+                <div data-tour-id="addon-search" className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-text-dim" />
                   <input
                     value={search}
@@ -939,6 +1006,7 @@ export function PackageBuilder({
                               onClick={() => (isBundled ? undefined : inCart ? removeItem(a.id) : addOn(a))}
                               disabled={isBundled}
                               title={isBundled ? `Included in the ${plan.name} plan` : undefined}
+                              data-tour-id={a.id === firstAddableAddOnId ? 'addon-add-button' : undefined}
                               className={cn(
                                 'shrink-0 w-6.5 h-6.5 rounded-lg flex items-center justify-center border transition-all cursor-pointer',
                                 isBundled
@@ -994,6 +1062,7 @@ export function PackageBuilder({
           )}>
             <div
               ref={dropRef}
+              data-tour-id="live-config"
               onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
               onDragLeave={(e) => {
                 if (!dropRef.current?.contains(e.relatedTarget as Node)) setDragOver(false);
@@ -1051,7 +1120,7 @@ export function PackageBuilder({
                 <div className="flex-1 flex flex-col min-h-0 mb-3" data-lenis-prevent>
                   <div
                     onClick={() => setIsMaximized(true)}
-                    className="relative w-full flex-1 min-h-[320px] lg:min-h-[360px] rounded-xl border border-white/5 bg-black/40 overflow-hidden p-3 flex items-center justify-center transition-all duration-700 ease-out cursor-zoom-in group/canvas"
+                    className="relative w-full flex-1 min-h-80 lg:min-h-90 rounded-xl border border-white/5 bg-black/40 overflow-hidden p-3 flex items-center justify-center transition-all duration-700 ease-out cursor-zoom-in group/canvas"
                   >
                     {/* HUD background grid */}
                     <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff03_1px,transparent_1px),linear-gradient(to_bottom,#ffffff03_1px,transparent_1px)] bg-size-[16px_16px] pointer-events-none" />
@@ -1400,34 +1469,37 @@ export function PackageBuilder({
                   )}
                 </div>
 
-                {/* Est. Total in 1 concise row */}
-                <div className="flex items-center justify-between pt-1.5 border-t border-white/6">
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-xs font-bold text-white">Est. Total:</span>
-                    <span className="font-display font-black text-lg text-white leading-none font-mono">
-                      {fmtK(monthlyTotal)}<span className="text-text-dim text-[10px] font-normal">/mo</span>
+                {/* Est. Total + CTA */}
+                <div data-tour-id="checkout" className="space-y-2">
+                  {/* Est. Total in 1 concise row */}
+                  <div className="flex items-center justify-between pt-1.5 border-t border-white/6">
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-xs font-bold text-white">Est. Total:</span>
+                      <span className="font-display font-black text-lg text-white leading-none">
+                        {fmtK(monthlyTotal)}<span className="text-text-dim text-[10px] font-normal">/mo</span>
+                      </span>
+                    </div>
+                    <span className="text-[10px] text-emerald-400 font-mono">
+                      Or {fmtK(annualMonthlyEquivalent)}/mo billed annually (-20%)
                     </span>
                   </div>
-                  <span className="text-[10px] text-emerald-400 font-mono">
-                    Or {fmtK(annualMonthlyEquivalent)}/mo billed annually (-20%)
-                  </span>
-                </div>
 
-                {/* CTA button */}
-                {isSignedIn ? (
-                  <Link href={ctaHref} className="block">
-                    <button className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-linear-to-r from-accent to-purple-600 text-white font-bold text-xs hover:from-accent-glow hover:to-purple-500 shadow-md transition-all cursor-pointer">
-                      Review Cart &amp; Checkout <ArrowRight className="w-3.5 h-3.5" />
+                  {/* CTA button */}
+                  {isSignedIn ? (
+                    <Link href={ctaHref} className="block">
+                      <button className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-linear-to-r from-accent to-purple-600 text-white font-bold text-xs hover:from-accent-glow hover:to-purple-500 shadow-md transition-all cursor-pointer">
+                        Review Cart &amp; Checkout <ArrowRight className="w-3.5 h-3.5" />
+                      </button>
+                    </Link>
+                  ) : (
+                    <button
+                      onClick={() => setLeadModalOpen(true)}
+                      className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-linear-to-r from-accent to-purple-600 text-white font-bold text-xs hover:from-accent-glow hover:to-purple-500 shadow-md transition-all cursor-pointer"
+                    >
+                      Sign Up &amp; Request Quote <ArrowRight className="w-3.5 h-3.5" />
                     </button>
-                  </Link>
-                ) : (
-                  <button
-                    onClick={() => setLeadModalOpen(true)}
-                    className="w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-linear-to-r from-accent to-purple-600 text-white font-bold text-xs hover:from-accent-glow hover:to-purple-500 shadow-md transition-all cursor-pointer"
-                  >
-                    Sign Up &amp; Request Quote <ArrowRight className="w-3.5 h-3.5" />
-                  </button>
-                )}
+                  )}
+                </div>
 
                 <div className="flex items-center justify-between text-[9px] text-text-dim pt-0.5">
                   <div className="flex items-center gap-1">
@@ -1501,6 +1573,7 @@ export function PackageBuilder({
             <div className="flex-1 relative min-h-0 w-full rounded-2xl border border-white/5 bg-black/40 overflow-hidden flex flex-row" data-lenis-prevent>
               {/* Left-docked glassmorphic Add-on Catalog sidebar */}
               <div
+                data-tour-id="max-addon-catalog"
                 className={cn(
                   "h-full bg-[#0a0a0f]/90 backdrop-blur-xl border-r border-white/10 flex flex-col overflow-hidden transition-all duration-300 ease-in-out shrink-0 relative z-20",
                   maxLeftSidebarOpen ? "w-80 opacity-100" : "w-12 opacity-90"
@@ -1978,6 +2051,8 @@ export function PackageBuilder({
                 )}
               </div>
             </div>
+
+            <GuidedTour ref={catalogTourRef} steps={catalogWorkspaceTourSteps} />
           </motion.div>
         )}
       </AnimatePresence>
@@ -1992,6 +2067,8 @@ export function PackageBuilder({
         customRequests={customItems.map((s) => s.name)}
         redirectTo={leadRedirect}
       />
+
+      <GuidedTour ref={tourRef} steps={configuratorTourSteps} />
     </section>
   );
 }

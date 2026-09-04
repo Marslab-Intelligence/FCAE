@@ -78,7 +78,7 @@ export function ContactPage() {
             <motion.h1 variants={fadeUp} initial="hidden" animate="visible" custom={1} className="font-display font-semibold text-fluid-hero tracking-tight leading-tight text-white mb-6">
               Let&apos;s talk about your <span className="text-gradient-accent">cloud strategy</span>
             </motion.h1>
-            <motion.p variants={fadeUp} initial="hidden" animate="visible" custom={2} className="text-xl text-white/55 leading-relaxed">
+            <motion.p variants={fadeUp} initial="hidden" animate="visible" custom={2} className="text-xl text-white/85 leading-relaxed">
               Whether you&apos;re exploring managed cloud for the first time or looking to optimize an existing setup — our experts are ready to help.
             </motion.p>
           </div>
@@ -103,9 +103,9 @@ export function ContactPage() {
                 <div className={`w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center mb-4 ${method.color}`}>
                   <method.icon className="w-5 h-5" />
                 </div>
-                <p className="text-xs font-semibold text-white/45 uppercase tracking-wider mb-1">{method.title}</p>
+                <p className="text-xs font-semibold text-white/75 uppercase tracking-wider mb-1">{method.title}</p>
                 <p className={`font-display font-semibold text-lg ${method.color} mb-1`}>{method.value}</p>
-                <p className="text-sm text-white/55">{method.desc}</p>
+                <p className="text-sm text-white/85">{method.desc}</p>
               </motion.a>
             ))}
           </div>
@@ -134,12 +134,12 @@ export function ContactPage() {
                 <form onSubmit={handleSubmit} className="space-y-5">
                   <div>
                     <h2 className="font-display font-semibold text-3xl text-white mb-2">Send us a message</h2>
-                    <p className="text-white/55 text-sm">We&apos;ll respond within 1 business day</p>
+                    <p className="text-white/80 text-sm">We&apos;ll respond within 1 business day</p>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-semibold text-white/55 uppercase tracking-wider mb-2">Full Name *</label>
+                      <label className="block text-xs font-semibold text-white/90 uppercase tracking-wider mb-2">Full Name *</label>
                       <input
                         type="text" required value={form.name}
                         onChange={e => setForm({ ...form, name: e.target.value })}
@@ -148,7 +148,7 @@ export function ContactPage() {
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-semibold text-white/55 uppercase tracking-wider mb-2">Work Email *</label>
+                      <label className="block text-xs font-semibold text-white/90 uppercase tracking-wider mb-2">Work Email *</label>
                       <input
                         type="email" required value={form.email}
                         onChange={e => setForm({ ...form, email: e.target.value })}
@@ -160,7 +160,7 @@ export function ContactPage() {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-semibold text-white/55 uppercase tracking-wider mb-2">Company</label>
+                      <label className="block text-xs font-semibold text-white/90 uppercase tracking-wider mb-2">Company</label>
                       <input
                         type="text" value={form.company}
                         onChange={e => setForm({ ...form, company: e.target.value })}
@@ -169,7 +169,7 @@ export function ContactPage() {
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-semibold text-white/55 uppercase tracking-wider mb-2">Phone</label>
+                      <label className="block text-xs font-semibold text-white/90 uppercase tracking-wider mb-2">Phone</label>
                       <input
                         type="tel" value={form.phone}
                         onChange={e => setForm({ ...form, phone: e.target.value })}
@@ -180,7 +180,7 @@ export function ContactPage() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-white/55 uppercase tracking-wider mb-2">Reason for contacting</label>
+                    <label className="block text-xs font-semibold text-white/90 uppercase tracking-wider mb-2">Reason for contacting</label>
                     <select
                       value={form.reason}
                       onChange={e => setForm({ ...form, reason: e.target.value })}
@@ -192,7 +192,7 @@ export function ContactPage() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-white/55 uppercase tracking-wider mb-2">Message *</label>
+                    <label className="block text-xs font-semibold text-white/90 uppercase tracking-wider mb-2">Message *</label>
                     <textarea
                       required rows={5} value={form.message}
                       onChange={e => setForm({ ...form, message: e.target.value })}
@@ -228,7 +228,7 @@ export function ContactPage() {
               >
                 <Calendar className="w-8 h-8 text-accent mb-4" />
                 <h3 className="font-display font-semibold text-xl text-white mb-2">Book a 30-min consultation</h3>
-                <p className="text-sm text-white/55 leading-relaxed mb-5">
+                <p className="text-sm text-white/85 leading-relaxed mb-5">
                   Speak directly with a cloud architect. We&apos;ll review your current infrastructure and share recommendations — no commitment required.
                 </p>
                 <a
@@ -249,10 +249,10 @@ export function ContactPage() {
               >
                 <Building2 className="w-8 h-8 text-emerald-400 mb-4" />
                 <h3 className="font-display font-semibold text-xl text-white mb-2">Enterprise Inquiries</h3>
-                <p className="text-sm text-white/55 leading-relaxed mb-4">
+                <p className="text-sm text-white/85 leading-relaxed mb-4">
                   For organizations with 500+ employees, complex multi-cloud environments, or compliance requirements — our enterprise team specializes in large-scale engagements.
                 </p>
-                <p className="text-sm text-white/55">
+                <p className="text-sm text-white/85">
                   Email: <a href="mailto:enterprise@sidcloud.com" className="text-accent hover:text-accent-glow transition-colors">enterprise@sidcloud.com</a>
                 </p>
               </motion.div>
@@ -266,20 +266,20 @@ export function ContactPage() {
                 className="p-6 rounded-2xl bg-white/3 border border-white/8"
               >
                 <div className="flex items-center gap-2 mb-4">
-                  <Clock className="w-5 h-5 text-white/45" />
+                  <Clock className="w-5 h-5 text-white/70" />
                   <h3 className="font-semibold text-sm text-white">Office Hours</h3>
                 </div>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-white/55">Monday – Friday</span>
-                    <span className="text-white">9:00 AM – 7:00 PM IST</span>
+                    <span className="text-white/85">Monday – Friday</span>
+                    <span className="text-white font-medium">9:00 AM – 7:00 PM IST</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-white/55">Saturday</span>
-                    <span className="text-white">10:00 AM – 2:00 PM IST</span>
+                    <span className="text-white/85">Saturday</span>
+                    <span className="text-white font-medium">10:00 AM – 2:00 PM IST</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-white/55">Emergency P1 Support</span>
+                    <span className="text-white/85">Emergency P1 Support</span>
                     <span className="text-accent font-medium">24/7 (Assure & Elite)</span>
                   </div>
                 </div>

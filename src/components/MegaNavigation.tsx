@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useMotionValue, useTransform, useSpring, type MotionValue } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useScrollProgress } from '@/hooks/useLenis';
 import {
@@ -56,6 +56,31 @@ const mainNavLinks = [
   { label: 'Contact', href: '/contact' },
 ];
 
+// Dock-style hover magnification for a single nav pill — grows the item as
+// the cursor nears its center, eases back as it moves away. Text/label only,
+// no icon dependency.
+const MAGNIFY_SPRING = { mass: 0.1, stiffness: 150, damping: 12 };
+const MAGNIFY_DISTANCE = 140;
+const MAGNIFY_SCALE = 1.16;
+
+function NavMagnifyItem({ mouseX, children }: { mouseX: MotionValue<number>; children: React.ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  const distance = useTransform(mouseX, (val) => {
+    const rect = ref.current?.getBoundingClientRect();
+    if (!rect) return Infinity;
+    return val - (rect.left + rect.width / 2);
+  });
+  const targetScale = useTransform(distance, [-MAGNIFY_DISTANCE, 0, MAGNIFY_DISTANCE], [1, MAGNIFY_SCALE, 1]);
+  const scale = useSpring(targetScale, MAGNIFY_SPRING);
+
+  return (
+    <motion.div ref={ref} style={{ scale }} className="will-change-transform">
+      {children}
+    </motion.div>
+  );
+}
+
 export interface NavUser {
   id: string;
   email: string;
@@ -76,6 +101,7 @@ export function MegaNavigation({ user }: { user: NavUser | null }) {
   const timeoutRef = useRef<ReturnType<typeof setTimeout>>(null);
   const navRef = useRef<HTMLDivElement>(null);
   const userNavRef = useRef<HTMLDivElement>(null);
+  const navMouseX = useMotionValue(Infinity);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
@@ -192,7 +218,9 @@ export function MegaNavigation({ user }: { user: NavUser | null }) {
           {/* Desktop Navigation — stellar-ai: links grouped into a floating glass pill */}
           <div
             ref={navRef}
-            className="col-start-2 justify-self-center hidden lg:flex items-center gap-0.5 xl:gap-1 liquid-glass !overflow-visible rounded-full px-1.5 xl:px-2 py-1.5 relative z-50"
+            onMouseMove={(e) => navMouseX.set(e.clientX)}
+            onMouseLeave={() => navMouseX.set(Infinity)}
+            className="col-start-2 justify-self-center hidden lg:flex items-center gap-0.5 xl:gap-1 liquid-glass overflow-visible! rounded-full px-1.5 xl:px-2 py-1.5 relative z-50"
           >
             {/* Mega Menu Triggers */}
             {Object.entries(megaMenus).map(([key, menu]) => (
@@ -202,24 +230,26 @@ export function MegaNavigation({ user }: { user: NavUser | null }) {
                 onMouseEnter={() => openMenu(key)}
                 onMouseLeave={closeMenu}
               >
-                <button
-                  type="button"
-                  onClick={(e) => handleButtonClick(key, e)}
-                  className={cn(
-                    'flex items-center gap-1.5 px-2.5 xl:px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors cursor-pointer',
-                    activeMenu === key
-                      ? 'bg-white/10 text-white'
-                      : 'text-white/75 hover:bg-white/5 hover:text-white'
-                  )}
-                  aria-expanded={activeMenu === key}
-                  aria-haspopup="true"
-                  aria-label={`${key} menu`}
-                >
-                  {key}
-                  <ChevronDown
-                    className={cn('w-3.5 h-3.5 transition-transform duration-200', activeMenu === key && 'rotate-180')}
-                  />
-                </button>
+                <NavMagnifyItem mouseX={navMouseX}>
+                  <button
+                    type="button"
+                    onClick={(e) => handleButtonClick(key, e)}
+                    className={cn(
+                      'flex items-center gap-1.5 px-2.5 xl:px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors cursor-pointer',
+                      activeMenu === key
+                        ? 'bg-white/10 text-white'
+                        : 'text-white/75 hover:bg-white/5 hover:text-white'
+                    )}
+                    aria-expanded={activeMenu === key}
+                    aria-haspopup="true"
+                    aria-label={`${key} menu`}
+                  >
+                    {key}
+                    <ChevronDown
+                      className={cn('w-3.5 h-3.5 transition-transform duration-200', activeMenu === key && 'rotate-180')}
+                    />
+                  </button>
+                </NavMagnifyItem>
 
                 <AnimatePresence>
                   {activeMenu === key && (
@@ -228,7 +258,7 @@ export function MegaNavigation({ user }: { user: NavUser | null }) {
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: 8, scale: 0.97 }}
                       transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-                      className="liquid-glass absolute top-full left-1/2 -translate-x-1/2 mt-2 w-[520px] rounded-2xl bg-stellar-panel/95 shadow-[0_20px_60px_-12px_rgba(0,0,0,0.8)] z-50 pointer-events-auto before:content-[''] before:absolute before:-top-3 before:left-0 before:right-0 before:h-3"
+                      className="liquid-glass absolute top-full left-1/2 -translate-x-1/2 mt-2 w-130 rounded-2xl bg-stellar-panel/95 shadow-[0_20px_60px_-12px_rgba(0,0,0,0.8)] z-50 pointer-events-auto before:content-[''] before:absolute before:-top-3 before:left-0 before:right-0 before:h-3"
                       onMouseEnter={cancelClose}
                       onMouseLeave={closeMenu}
                     >
@@ -258,13 +288,14 @@ export function MegaNavigation({ user }: { user: NavUser | null }) {
             ))}
 
             {mainNavLinks.map((link) => (
-              <Link
-                key={link.label}
-                href={link.href}
-                className="px-2.5 xl:px-4 py-2 rounded-full text-sm font-medium text-white/75 whitespace-nowrap hover:text-white hover:bg-white/5 transition-all"
-              >
-                {link.label}
-              </Link>
+              <NavMagnifyItem key={link.label} mouseX={navMouseX}>
+                <Link
+                  href={link.href}
+                  className="block px-2.5 xl:px-4 py-2 rounded-full text-sm font-medium text-white/75 whitespace-nowrap hover:text-white hover:bg-white/5 transition-all"
+                >
+                  {link.label}
+                </Link>
+              </NavMagnifyItem>
             ))}
           </div>
 
@@ -366,14 +397,14 @@ export function MegaNavigation({ user }: { user: NavUser | null }) {
               {Object.entries(megaMenus).map(([key, menu]) => {
                 const isOpen = !!mobileOpenMenus[key];
                 return (
-                  <div key={key} className="space-y-1 rounded-2xl bg-white/[0.02] border border-white/[0.06] p-2">
+                  <div key={key} className="space-y-1 rounded-2xl bg-white/2 border border-white/6 p-2">
                     <button
                       type="button"
                       onClick={() => toggleMobileMenu(key)}
                       className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium text-white hover:bg-white/5 transition-colors cursor-pointer"
                       aria-expanded={isOpen}
                     >
-                      <span className="stellar-eyebrow !px-0 !py-0 text-white/90">{key}</span>
+                      <span className="stellar-eyebrow px-0! py-0! text-white/90">{key}</span>
                       <ChevronDown
                         className={cn('w-4 h-4 text-white/60 transition-transform duration-200', isOpen && 'rotate-180')}
                       />

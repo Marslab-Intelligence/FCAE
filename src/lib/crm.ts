@@ -11,6 +11,7 @@ import 'server-only';
 const CRM_BASE_URL = process.env.CRM_API_URL ?? '';
 const CRM_API_KEY = process.env.CRM_API_KEY ?? '';
 const CRM_INTAKE_PATH = process.env.CRM_INTAKE_PATH ?? '/api/v1/public/leads';
+const CRM_SIGNUP_PATH = process.env.CRM_SIGNUP_PATH ?? '/api/v1/public/fcae-signups';
 const CRM_TIMEOUT_MS = Number(process.env.CRM_TIMEOUT_MS ?? 8000);
 
 /**
@@ -123,6 +124,70 @@ export async function pushLeadToCrm(payload: CrmLeadPayload): Promise<CrmPushRes
           ? err.message
           : 'Unknown CRM error';
     return { ok: false, error: reason };
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+/**
+ * Hand-off for plain account sign-ups — a separate, lighter-weight concept
+ * from an enquiry Lead above. Every new account (however it was created)
+ * should show up in the CRM as an "FCAE Signup" so sales can see everyone
+ * who registered on the website, not just people who submitted the
+ * package-builder form.
+ *
+ * Unlike `pushLeadToCrm`, a signup isn't stored locally first — losing one
+ * just means the CRM finds out about this person a little late, not that
+ * a business-critical enquiry vanishes. So this is fire-and-forget: it
+ * never throws, and failures are only logged.
+ */
+export type CrmSignupMethod = 'PASSWORD' | 'OTP' | 'GOOGLE';
+
+export interface CrmSignupUser {
+  /** Falls back to the email address when no name was collected (password/OTP signup). */
+  name?: string | null;
+  email: string;
+  phone?: string | null;
+}
+
+export async function pushSignupToCrm(user: CrmSignupUser, method: CrmSignupMethod): Promise<void> {
+  if (!isCrmConfigured()) return;
+
+  const payload = {
+    fullName: user.name?.trim() || user.email,
+    email: user.email,
+    ...(user.phone ? { phone: user.phone } : {}),
+    signupMethod: method,
+  };
+
+  const url = `${CRM_BASE_URL.replace(/\/$/, '')}${CRM_SIGNUP_PATH}`;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), CRM_TIMEOUT_MS);
+
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': CRM_API_KEY,
+      },
+      body: JSON.stringify(payload),
+      cache: 'no-store',
+      signal: controller.signal,
+    });
+
+    if (!res.ok) {
+      const text = await res.text();
+      console.error(`CRM signup push failed (${res.status}): ${text.slice(0, 300)}`);
+    }
+  } catch (err) {
+    const reason =
+      err instanceof Error && err.name === 'AbortError'
+        ? `CRM did not respond within ${CRM_TIMEOUT_MS}ms`
+        : err instanceof Error
+          ? err.message
+          : 'Unknown CRM error';
+    console.error(`CRM signup push failed: ${reason}`);
   } finally {
     clearTimeout(timer);
   }

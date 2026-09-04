@@ -2,12 +2,14 @@
 
 import { eq, and, gt } from 'drizzle-orm';
 import { redirect } from 'next/navigation';
+import { after } from 'next/server';
 import { z } from 'zod';
 import { db } from '@/db/client';
 import { users, otpTokens } from '@/db/schema';
 import { createSession, setSessionCookie } from '@/lib/auth';
 import { sendOtpEmail } from '@/lib/mail';
 import { adoptPendingPlan } from '@/lib/pending-plan';
+import { pushSignupToCrm } from '@/lib/crm';
 
 const OTP_TTL_MS = 10 * 60 * 1000;   // 10 minutes
 const MAX_ATTEMPTS = 5;
@@ -94,6 +96,7 @@ export async function verifyOtpAction(
     let [user] = await db.select().from(users).where(eq(users.email, email)).limit(1);
     if (!user) {
       [user] = await db.insert(users).values({ email }).returning();
+      after(() => pushSignupToCrm({ name: user.name, email: user.email }, 'OTP'));
     }
 
     await adoptPendingPlan(user.id);

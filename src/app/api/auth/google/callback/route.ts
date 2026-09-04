@@ -1,9 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse, after } from 'next/server';
 import { eq } from 'drizzle-orm';
 import { db } from '@/db/client';
 import { users } from '@/db/schema';
 import { createSession } from '@/lib/auth';
 import { adoptPendingPlan } from '@/lib/pending-plan';
+import { pushSignupToCrm } from '@/lib/crm';
 
 const STATE_COOKIE = 'google_oauth_state';
 const SESSION_COOKIE = 'mercury_session';
@@ -84,6 +85,7 @@ export async function GET(request: NextRequest) {
           .insert(users)
           .values({ email: profile.email, googleId: profile.sub, name: profile.name ?? null })
           .returning();
+        after(() => pushSignupToCrm({ name: user.name, email: user.email }, 'GOOGLE'));
       }
     }
 

@@ -97,11 +97,11 @@ function FAQItem({ faq, index }: { faq: typeof faqs[0]; index: number }) {
     >
       <button
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between gap-4 px-6 py-5 text-left"
+        className="w-full flex items-center justify-between gap-4 px-6 py-5 text-left group cursor-pointer"
         aria-expanded={open}
       >
-        <span className={cn('font-medium text-sm leading-relaxed transition-colors', open ? 'text-white' : 'text-white/55')}>{faq.q}</span>
-        <ChevronDown className={cn('w-5 h-5 shrink-0 text-white/45 transition-transform duration-300', open && 'rotate-180 text-accent')} />
+        <span className={cn('font-medium text-sm md:text-base leading-relaxed text-white transition-colors', open && 'font-semibold')}>{faq.q}</span>
+        <ChevronDown className={cn('w-5 h-5 shrink-0 text-white/75 transition-transform duration-300 group-hover:text-white', open && 'rotate-180 text-accent')} />
       </button>
       <AnimatePresence>
         {open && (
@@ -112,7 +112,7 @@ function FAQItem({ faq, index }: { faq: typeof faqs[0]; index: number }) {
             transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
             className="overflow-hidden"
           >
-            <p className="px-6 pb-6 text-sm text-white/55 leading-relaxed">{faq.a}</p>
+            <p className="px-6 pb-6 text-sm text-white/85 leading-relaxed">{faq.a}</p>
           </motion.div>
         )}
       </AnimatePresence>
@@ -133,13 +133,13 @@ export function FAQsPage() {
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-150 h-150 rounded-full bg-linear-to-r from-accent/8 to-purple-600/5 blur-3xl" />
         </div>
         <div className="relative max-w-3xl mx-auto px-6">
-          <motion.div variants={fadeUp} initial="hidden" animate="visible" className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-sm font-medium text-white/55 mb-8">
+          <motion.div variants={fadeUp} initial="hidden" animate="visible" className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/15 text-sm font-medium text-white/90 mb-8">
             <HelpCircle className="w-4 h-4 text-accent" /> Frequently Asked Questions
           </motion.div>
           <motion.h1 variants={fadeUp} initial="hidden" animate="visible" custom={1} className="font-display font-semibold text-fluid-hero tracking-tight leading-tight text-white mb-6">
             Questions? <span className="text-gradient-accent">We have answers.</span>
           </motion.h1>
-          <motion.p variants={fadeUp} initial="hidden" animate="visible" custom={2} className="text-lg text-white/55 leading-relaxed">
+          <motion.p variants={fadeUp} initial="hidden" animate="visible" custom={2} className="text-lg text-white/80 leading-relaxed">
             Can&apos;t find what you&apos;re looking for? Reach out to our team.
           </motion.p>
         </div>
@@ -154,10 +154,10 @@ export function FAQsPage() {
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
                 className={cn(
-                  'px-4 py-2 rounded-full text-sm font-medium border transition-all',
+                  'px-4 py-2 rounded-full text-sm font-medium border transition-all cursor-pointer',
                   activeCategory === cat
-                    ? 'bg-accent/15 border-accent/40 text-accent'
-                    : 'bg-white/3 border-white/10 text-white/55 hover:border-white/20 hover:text-white'
+                    ? 'bg-accent/20 border-accent/60 text-white shadow-[0_0_15px_rgba(168,85,247,0.35)]'
+                    : 'bg-white/5 border-white/15 text-white/90 hover:border-white/30 hover:text-white hover:bg-white/10'
                 )}
               >
                 {cat}
@@ -188,7 +188,7 @@ export function FAQsPage() {
           >
             <MessageCircle className="w-12 h-12 text-accent mx-auto mb-4" />
             <h2 className="font-display font-semibold text-3xl text-white mb-3">Still have questions?</h2>
-            <p className="text-white/55 mb-8">Our cloud experts are available to answer your specific requirements and help you find the right plan.</p>
+            <p className="text-white/80 mb-8">Our cloud experts are available to answer your specific requirements and help you find the right plan.</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/contact" className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-linear-to-r from-accent to-purple-600 text-white font-semibold hover:from-accent-glow hover:to-purple-500 shadow-[0_0_30px_-8px_rgba(168,85,247,0.6)] transition-all">
                 Talk to an Expert <ArrowRight className="w-4 h-4" />

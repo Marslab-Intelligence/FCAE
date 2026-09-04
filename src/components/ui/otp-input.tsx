@@ -410,7 +410,7 @@ export function OtpInput({
                         ? "border-[#4568FF] bg-white dark:border-[#93B0FF] dark:bg-[#252522]"
                         : char
                           ? "border-stone-300 bg-white dark:border-white/20 dark:bg-[#252522]"
-                          : "border-stone-200 bg-stone-100/70 shadow-[inset_0_1px_2px_rgba(28,25,23,0.07)] dark:border-white/[0.08] dark:bg-[#1D1D1A] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.45)]"
+                          : "border-stone-200 bg-stone-100/70 shadow-[inset_0_1px_2px_rgba(28,25,23,0.07)] dark:border-white/8 dark:bg-[#1D1D1A] dark:shadow-[inset_0_1px_2px_rgba(0,0,0,0.45)]"
                 }`}
               />
 
@@ -458,7 +458,7 @@ export function OtpInput({
 
                 {active && !char && !disabled ? (
                   <motion.span
-                    className="col-start-1 row-start-1 block h-[17px] w-[1.5px] rounded-[1px] bg-stone-700 dark:bg-stone-200"
+                    className="col-start-1 row-start-1 block h-4.25 w-[1.5px] rounded-[1px] bg-stone-700 dark:bg-stone-200"
                     initial={{ opacity: 1 }}
                     animate={
                       reduced ? { opacity: 1 } : { opacity: [1, 1, 0, 0] }
@@ -485,7 +485,7 @@ export function OtpInput({
         <>
           <div
             aria-hidden
-            className="mt-2 grid h-4 text-[11.5px] leading-[16px]"
+            className="mt-2 grid h-4 text-[11.5px] leading-4"
           >
             <AnimatePresence initial={false} mode="wait">
               <motion.span

@@ -31,3 +31,6 @@ next-env.d.ts
 /playwright-report/
 /blob-report/
 *.png
+
+# Local embedded database
+/.pgdata/

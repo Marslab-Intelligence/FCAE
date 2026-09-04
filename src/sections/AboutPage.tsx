@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import {
@@ -85,6 +86,55 @@ const fadeUp = {
 };
 
 export function AboutPage() {
+  const timelineRef = useRef<HTMLDivElement | null>(null);
+  const timelineFillRef = useRef<HTMLDivElement | null>(null);
+  const timelineItemRefs = useRef<Array<HTMLDivElement | null>>([]);
+
+  useEffect(() => {
+    const wrap = timelineRef.current;
+    if (!wrap) return;
+
+    // Respect reduced-motion: leave the CSS default (everything visible,
+    // fill line fully drawn) alone and skip the observer entirely.
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    // Opt into the hidden-until-revealed CSS states. If this effect never
+    // runs (JS disabled/fails), the timeline stays in its static, fully
+    // visible default state.
+    wrap.classList.add('timeline-js');
+    const fill = timelineFillRef.current;
+    if (fill) fill.style.height = '0px';
+
+    const items = timelineItemRefs.current.filter((el): el is HTMLDivElement => el !== null);
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          const target = entry.target as HTMLDivElement;
+          target.classList.add('is-visible');
+
+          // Grow the connecting line to reach this item's dot — recomputed
+          // only on reveal, never on scroll.
+          if (fill) {
+            const dot = target.querySelector<HTMLElement>('.timeline-dot');
+            if (dot) {
+              const reach = dot.offsetTop + dot.offsetHeight / 2 - wrap.offsetTop;
+              fill.style.height = `${Math.max(reach, 0)}px`;
+            }
+          }
+
+          observer.unobserve(target);
+        }
+      },
+      { threshold: 0.25 }
+    );
+
+    items.forEach((el) => observer.observe(el));
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <div className="relative overflow-hidden">
       {/* Hero */}
@@ -98,7 +148,7 @@ export function AboutPage() {
             variants={fadeUp}
             initial="hidden"
             animate="visible"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-sm font-medium text-white/55 mb-8"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/15 text-sm font-medium text-white/90 mb-8"
           >
             <Users className="w-4 h-4 text-accent" />
             Our Story
@@ -118,7 +168,7 @@ export function AboutPage() {
             initial="hidden"
             animate="visible"
             custom={2}
-            className="text-xl text-white/55 max-w-3xl mx-auto leading-relaxed"
+            className="text-xl text-white/85 max-w-3xl mx-auto leading-relaxed"
           >
             SID Managed Cloud was founded by practitioners who spent years inside AWS, Google Cloud, and Microsoft Azure. We built the service we always wanted — one that treats cloud operations as a strategic business function, not a cost center.
           </motion.p>
@@ -145,7 +195,7 @@ export function AboutPage() {
                   </div>
                 </div>
                 <p className="font-display font-semibold text-2xl sm:text-3xl lg:text-4xl text-white mb-1">{stat.value}</p>
-                <p className="text-sm text-white/55">{stat.label}</p>
+                <p className="text-sm text-white/85 font-medium">{stat.label}</p>
               </motion.div>
             ))}
           </div>
@@ -162,7 +212,7 @@ export function AboutPage() {
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true }}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-sm font-medium text-white/55 mb-6"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/15 text-sm font-medium text-white/90 mb-6"
               >
                 <Target className="w-4 h-4 text-accent" /> Our Mission
               </motion.span>
@@ -182,7 +232,7 @@ export function AboutPage() {
                 whileInView="visible"
                 viewport={{ once: true }}
                 custom={2}
-                className="text-lg text-white/55 leading-relaxed mb-8"
+                className="text-lg text-white/85 leading-relaxed mb-8"
               >
                 We believe every organization deserves access to world-class cloud expertise — not just the Fortune 500. Our managed services model gives mid-market and enterprise companies the same operational rigor that tech giants build in-house, at a fraction of the cost.
               </motion.p>
@@ -197,7 +247,7 @@ export function AboutPage() {
                 {['Transparent pricing with no hidden fees', 'Dedicated cloud engineers, not ticket-based support', 'Proactive operations before issues become incidents', 'Strategic partnership, not just vendor management'].map((point) => (
                   <div key={point} className="flex items-start gap-3">
                     <CheckCircle2 className="w-5 h-5 text-accent shrink-0 mt-0.5" />
-                    <span className="text-white/55 text-sm">{point}</span>
+                    <span className="text-white/90 text-sm">{point}</span>
                   </div>
                 ))}
               </motion.div>
@@ -217,7 +267,7 @@ export function AboutPage() {
                     <v.icon className="w-5 h-5" />
                   </div>
                   <h3 className="font-display font-semibold text-lg text-white mb-2">{v.title}</h3>
-                  <p className="text-sm text-white/55 leading-relaxed">{v.desc}</p>
+                  <p className="text-sm text-white/90 leading-relaxed">{v.desc}</p>
                 </motion.div>
               ))}
             </div>
@@ -233,7 +283,7 @@ export function AboutPage() {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
-            className="text-center text-xs uppercase tracking-widest text-white/45 font-semibold mb-8"
+            className="text-center text-xs uppercase tracking-widest text-white/70 font-semibold mb-8"
           >
             Industry Certifications & Partnerships
           </motion.p>
@@ -246,7 +296,7 @@ export function AboutPage() {
                 whileInView="visible"
                 viewport={{ once: true }}
                 custom={i * 0.1}
-                className="px-5 py-3 rounded-2xl bg-white/5 border border-white/10 text-sm font-medium text-white/55 hover:border-accent/30 hover:text-white transition-all"
+                className="px-5 py-3 rounded-2xl bg-white/5 border border-white/15 text-sm font-medium text-white/90 hover:border-accent/30 hover:text-white transition-all"
               >
                 {cert}
               </motion.div>
@@ -268,34 +318,42 @@ export function AboutPage() {
             >
               Our <span className="text-gradient-accent">Journey</span>
             </motion.h2>
-            <p className="text-white/55 text-lg">A decade of cloud excellence</p>
+            <p className="text-white/85 text-lg">A decade of cloud excellence</p>
           </div>
-          <div className="relative">
+          <div ref={timelineRef} className="relative">
             <div className="absolute left-6 md:left-1/2 top-0 bottom-0 w-px bg-linear-to-b from-transparent via-white/15 to-transparent" />
+            <div
+              ref={timelineFillRef}
+              className="timeline-fill absolute left-6 md:left-1/2 top-0 w-px bg-linear-to-b from-accent to-cyan-400"
+              aria-hidden="true"
+            />
             <div className="space-y-12">
               {milestones.map((m, i) => (
-                <motion.div
+                <div
                   key={m.year}
-                  variants={fadeUp}
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true }}
-                  custom={i * 0.15}
-                  className={cn('flex gap-8 md:gap-0', i % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse')}
+                  ref={(el) => { timelineItemRefs.current[i] = el; }}
+                  className={cn(
+                    'timeline-item flex gap-8 md:gap-0',
+                    i % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse timeline-item--reverse'
+                  )}
                 >
                   <div className={cn('hidden md:block md:w-1/2 py-4', i % 2 === 0 ? 'text-right pr-12' : 'text-left pl-12')}>
-                    <span className="font-display font-semibold text-3xl lg:text-5xl text-accent/40">{m.year}</span>
+                    <span className="timeline-year font-display font-bold text-3xl lg:text-5xl text-white drop-shadow-[0_0_20px_rgba(167,139,250,0.8)]">{m.year}</span>
                   </div>
                   <div className="relative flex items-center justify-center">
-                    <div className="w-12 h-12 rounded-full bg-accent/15 border-2 border-accent/40 flex items-center justify-center z-10 shrink-0">
-                      <span className="text-xs font-bold text-accent">{m.year.slice(2)}</span>
+                    <div className="timeline-dot relative w-14 h-14 flex items-center justify-center z-10 shrink-0">
+                      <span className="timeline-dot-ring absolute inset-0 rounded-full" aria-hidden="true" />
+                      <span className="timeline-dot-halo absolute inset-0 rounded-full" aria-hidden="true" />
+                      <span className="timeline-dot-core relative w-10 h-10 rounded-full flex items-center justify-center">
+                        <span className="text-xs font-bold text-white">{m.year.slice(2)}</span>
+                      </span>
                     </div>
                   </div>
-                  <div className={cn('md:w-1/2 py-4', i % 2 === 0 ? 'pl-8 md:pl-12' : 'md:pr-12')}>
-                    <span className="md:hidden text-accent font-bold font-display">{m.year}: </span>
-                    <p className="text-white/55 text-sm leading-relaxed">{m.event}</p>
+                  <div className={cn('timeline-text md:w-1/2 py-4', i % 2 === 0 ? 'pl-8 md:pl-12' : 'md:pr-12')}>
+                    <span className="md:hidden text-white font-bold font-display">{m.year}: </span>
+                    <p className="text-white/90 text-sm leading-relaxed">{m.event}</p>
                   </div>
-                </motion.div>
+                </div>
               ))}
             </div>
           </div>
@@ -315,7 +373,7 @@ export function AboutPage() {
             >
               Leadership <span className="text-gradient-accent">Team</span>
             </motion.h2>
-            <p className="text-white/55 text-lg max-w-2xl mx-auto">
+            <p className="text-white/85 text-lg max-w-2xl mx-auto">
               Practitioners who&apos;ve operated cloud at the world&apos;s largest tech companies.
             </p>
           </div>
@@ -335,7 +393,7 @@ export function AboutPage() {
                 </div>
                 <h3 className="font-display font-semibold text-lg text-white mb-0.5">{member.name}</h3>
                 <p className="text-accent text-sm font-medium mb-2">{member.role}</p>
-                <p className="text-xs text-white/45 leading-relaxed">{member.exp}</p>
+                <p className="text-xs text-white/80 leading-relaxed">{member.exp}</p>
               </motion.div>
             ))}
           </div>
@@ -355,7 +413,7 @@ export function AboutPage() {
             <h2 className="font-display font-semibold text-fluid-h2 tracking-tight text-white mb-4">
               Ready to transform your <span className="text-gradient-accent">cloud operations?</span>
             </h2>
-            <p className="text-white/55 text-lg mb-8 max-w-2xl mx-auto">
+            <p className="text-white/85 text-lg mb-8 max-w-2xl mx-auto">
               Join 200+ enterprises who&apos;ve trusted SID Managed Cloud to handle their most critical infrastructure.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
